@@ -34,7 +34,7 @@ export default function App() {
       })
   }
 
-  var trendLine = 'Flat';
+  var trendLine;
   if (sugarTrend === 1) {
     trendLine = 'Going Up Fast (i think, 1)';
   } else if (sugarTrend === 2) {
