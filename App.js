@@ -3,14 +3,123 @@ import axios from 'axios';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { VictoryLine, VictoryChart } from "victory-native";
+//const { google } = require('googleapis'); //ADD
+//const request = require('request'); //ADD
+//const cors = require('cors'); //ADD
+//const urlParse = require('url-parse'); //ADD
+//const queryParse = require('query-string'); //ADD
+//const bodyParser = require('body-parser'); //ADD
+//const axios = require('axios');
+//var express = require('express');
+//var app = express();
 
-export default function App() {
+// ios client id: 
+// 79485309173-tq4rnq6g8vllhguh52grdh2anu7dftq3.apps.googleusercontent.com
+
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import googleAuth from './screens/googleAuth';
+
+const Stack = createNativeStackNavigator();
+
+function HomeScreen() {
+
   const [bloodGlucose, setBloodGlucose] = useState(0);
   const [sugarTrend, setSugarTrend] = useState(0);
+  const [sleep, setSleep] = useState(0);
   const [bgOne, setBgOne] = useState(0);
   const [bgTwo, setBgTwo] = useState(0);
   const [bgThree, setBgThree] = useState(0);
 
+  //app.use(cors());
+  //app.use(bodyParser.urlencoded({ extended: true }));
+  //app.use(bodyParser.json());
+
+
+/* //SLEEP CODE ADDING 6/30 
+  const updateSleep = () => {
+
+    app.get('/getSleep', (req, res) => {
+      const oauth2Client = new google.auth.OAuth2(
+        //client id
+        '79485309173-jutqi66l6q5um7abflpsi4t2f0t4o1jr.apps.googleusercontent.com',
+        //client secret
+        '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',
+        //redirect to link
+        'http://localhost:3001/sleep'
+      );
+      const scopes = ['https://www.googleapis.com/auth/fitness.sleep.read', 'https://www.googleapis.com/auth/fitness.activity.read', 'profile', 'email', 'openid'];
+    
+      const url = oauth2Client.generateAuthUrl({
+        access_type: 'offline',
+        scope: scopes,
+        state: JSON.stringify({
+          callbackUrl: req.body.callbackUrl,
+          userID: req.body.userid
+        })
+      })
+      request(url, (err, response, body) => {
+        console.log('error: ', err);
+        console.log('statusCode: ', response && response.statusCode);
+        res.send({ url });
+      })
+    });
+    
+    app.get('/sleep', async (req, res) => {
+      const queryURL = new urlParse(req.url);
+      const code = queryParse.parse(queryURL.query).code;
+    
+      const oauth2Client = new google.auth.OAuth2(
+        //client id
+        '79485309173-jutqi66l6q5um7abflpsi4t2f0t4o1jr.apps.googleusercontent.com',
+        //client secret
+        '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',
+        //redirect to link
+        'http://localhost:3001/sleep'
+      );
+    
+      const {tokens} = await oauth2Client.getToken(code);
+      //console.log(tokens, 'token');
+      res.send('You Google Fit Account has been connected');
+      
+      try {
+        axios.get('https://fitness.googleapis.com/fitness/v1/users/me/sessions?activityType=72&includeDeleted=true&startTime=2022-06-19T23%3A20%3A50.52Z', {
+          headers: {authorization: 'Bearer ' + tokens.access_token},
+        })
+          .then(response => {
+          data = response.data
+          console.log(data)
+
+          setSleep(data[0].activityType)
+          })
+          .catch(error => {
+            if (error.response) {
+              console.log(error.response.status)
+              console.log(error.message)
+            } else {
+              console.log(error.message)
+              console.log(error.data)
+            }
+          })
+      } catch (e) {
+        console.log(e);
+      }
+   })
+
+  };
+
+  useEffect(() => {
+    updateSleep();
+    const timer = setInterval(() => {
+      updateSleep();
+    }, 30000)
+
+    return () => clearInterval(timer);
+
+  }, [])
+*/
+
+ //Get Blood GLucoe (working)
   const updateSGV = () => {
     axios.get('http://cgmari.herokuapp.com/api/v1/entries/current', {
       headers: {'API-SECRET': '80f33cadfe0ec3aa14574a4aa078a48ca4764a2b'},
@@ -32,7 +141,7 @@ export default function App() {
           console.log(error.message)
         }
       })
-  }
+  };
 
   var trendLine;
   if (sugarTrend === 1) {
@@ -65,7 +174,7 @@ export default function App() {
       setBgThree(bgTwo);
       setBgTwo(bgOne);
       setBgOne(bloodGlucose);
-    }, 30000);
+    }, 3000000);
     return () => clearInterval(toggle);
   })
 
@@ -74,7 +183,7 @@ export default function App() {
     updateSGV();
     const timer = setInterval(() => {
       updateSGV();
-    }, 30000)
+    }, 3000000)
 
     return () => clearInterval(timer);
 
@@ -82,6 +191,9 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      
+      <Text style={{ fontSize: 30, color: '#1f95bd' }}>Should say 72?</Text>
+      <Text style={{ fontSize: 50, color:'#08518e' }}>{bloodGlucose}</Text>
 
       <Text style={{ fontSize: 30, color: '#1f95bd' }}>Current Blood Glucose:</Text>
       <Text style={{ fontSize: 50, color:'#08518e' }}>{bloodGlucose}</Text>
@@ -93,9 +205,20 @@ export default function App() {
       </VictoryChart>
 
     </View>
-    
   );
 }
+
+export default function App() {
+  return (
+    <NavigationContainer>
+        <Stack.Navigator>
+        <Stack.Screen name="GoogleAuth" component={googleAuth} />
+        <Stack.Screen name="HomeScreen" component={HomeScreen} />
+        </Stack.Navigator>
+    </NavigationContainer>
+  )
+}
+
 
 const styles = StyleSheet.create({
   container: {

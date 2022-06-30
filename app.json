@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "bsRealTime",
+    "scheme": "Daia",
     "slug": "bsRealTime",
     "version": "1.0.0",
     "orientation": "portrait",
