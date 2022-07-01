@@ -3,9 +3,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { VictoryLine, VictoryChart } from "victory-native";
 
-// ios client id: 
-// 79485309173-tq4rnq6g8vllhguh52grdh2anu7dftq3.apps.googleusercontent.com
-
 export default function sugarGraph() {
 
     const [bloodGlucose, setBloodGlucose] = useState(0);
@@ -14,8 +11,9 @@ export default function sugarGraph() {
     const [bgTwo, setBgTwo] = useState(0);
     const [bgThree, setBgThree] = useState(0);
   
-   //Get Blood GLucoe (working)
     const updateSGV = () => {
+        //so after asking for google account for sleep data,
+        //ask for them to type in herokuapp username (cgmari) and API-SECRET
       axios.get('http://cgmari.herokuapp.com/api/v1/entries/current', {
         headers: {'API-SECRET': '80f33cadfe0ec3aa14574a4aa078a48ca4764a2b'},
       })
@@ -40,9 +38,9 @@ export default function sugarGraph() {
   
     var trendLine;
     if (sugarTrend === 1) {
-      trendLine = 'Going Up Fast (i think, 1)';
+      trendLine = 'Going Up Fast';
     } else if (sugarTrend === 2) {
-      trendLine = 'Going Up (i think, 2)'
+      trendLine = 'Going Up'
     } else if (sugarTrend === 3) {
       trendLine = 'Slightly Going Up'
     } else if (sugarTrend === 4) {
@@ -52,7 +50,7 @@ export default function sugarGraph() {
     } else if (sugarTrend === 6) {
       trendLine = 'Going Down'
     } else if (sugarTrend === 7) {
-      trendLine = 'Going Down Fast (i think, 7)'
+      trendLine = 'Going Down Fast'
     } else {
       trendLine = 'Unknown';
     };
