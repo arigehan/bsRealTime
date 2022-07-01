@@ -5,7 +5,7 @@ import * as WebBrowser from 'expo-web-browser';
 
 WebBrowser.maybeCompleteAuthSession();
 
-export default function googleAuth({ navigation }) {
+export default function connectNS({ navigation }) {
 
   const [accessToken, setAccessToken] = React.useState();
   const [userInfo, setUserInfo] = React.useState();
@@ -44,8 +44,8 @@ export default function googleAuth({ navigation }) {
     }
   }
 
-  function navToSugar() {
-    navigation.navigate('SugarGraph');
+  function navToNS() {
+    navigation.navigate('ConnectNS');
   }
 
   return (
@@ -53,7 +53,7 @@ export default function googleAuth({ navigation }) {
         {showUserInfo()}
        <Button 
        title={accessToken ? (userInfo ? "Continue" : "Get User Data") : "Login"}
-       onPress={accessToken ? (userInfo? navToSugar : getUserData) : () => { promptAsync({showInRecents: true}) }}
+       onPress={accessToken ? (userInfo? navToNS : getUserData) : () => { promptAsync({showInRecents: true}) }}
        />
     </View>
     
