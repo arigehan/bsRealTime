@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 
@@ -6,10 +6,14 @@ WebBrowser.maybeCompleteAuthSession();
 
 export default function connectNS({ navigation }) {
 
-  var nsUserName, nsApiKey; 
+  const [nsUserName, setNsUserName] = useState('');
+  const [nsApiKey, setNsApiKey] = useState('');
 
   function navToSugar() {
-    navigation.navigate('SugarGraph');
+    navigation.navigate('SugarGraph', {
+        nsUserName: nsUserName,
+        nsApiKey: nsApiKey
+    });
   }
 
   return (
@@ -18,14 +22,16 @@ export default function connectNS({ navigation }) {
        <Text>Your username can be found in your Heroku App URL</Text>
        <TextInput
         style={styles.input}
-        value={nsUserName}
         placeholder="Night Scout Username"
+        onChangeText={newText => setNsUserName(newText)}
+        defaultValue={nsUserName}
       />
       <Text>Your API Secret was made when you created your Night Scout account</Text>
       <TextInput
         style={styles.input}
-        value={nsApiKey}
         placeholder="API Key"
+        onChangeText={newText => setNsApiKey(newText)}
+        defaultValue={nsApiKey}
       />
       <Button 
        title="Connect"

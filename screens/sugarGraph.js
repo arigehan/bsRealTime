@@ -1,9 +1,10 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Button } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { VictoryLine, VictoryChart } from "victory-native";
+import { useRoute } from '@react-navigation/native'
 
-export default function sugarGraph() {
+export default function sugarGraph({ navigation }) {
 
     const [bloodGlucose, setBloodGlucose] = useState(0);
     const [sugarTrend, setSugarTrend] = useState(0);
@@ -12,10 +13,8 @@ export default function sugarGraph() {
     const [bgThree, setBgThree] = useState(0);
   
     const updateSGV = () => {
-        //so after asking for google account for sleep data,
-        //ask for them to type in herokuapp username (cgmari) and API-SECRET
-      axios.get('http://cgmari.herokuapp.com/api/v1/entries/current', {
-        headers: {'API-SECRET': '80f33cadfe0ec3aa14574a4aa078a48ca4764a2b'},
+      axios.get(`http://${route.params.nsUserName}.herokuapp.com/api/v1/entries/current`, { //cgmari
+        headers: {'API-SECRET': route.params.nsApiKey} //'80f33cadfe0ec3aa14574a4aa078a48ca4764a2b'
       })
         .then(response => {
           console.log(response.data)
@@ -36,7 +35,7 @@ export default function sugarGraph() {
         })
     };
   
-    var trendLine;
+    var trendLine; // names of trend 
     if (sugarTrend === 1) {
       trendLine = 'Going Up Fast';
     } else if (sugarTrend === 2) {
@@ -55,39 +54,49 @@ export default function sugarGraph() {
       trendLine = 'Unknown';
     };
   
-    const graphData = [
+    const graphData = [ //array for data points of graph, y is time since that reading 
       { quarter: 15, earnings: bgThree },
       { quarter: 10, earnings: bgTwo },
       { quarter: 5, earnings: bgOne },
       { quarter: 0, earnings: bloodGlucose }
     ];
   
-    useEffect(() => {
+    useEffect(() => { //creates blood data for chart, updates every 5 minutes 
       const toggle = setInterval(() => {
         setBgThree(bgTwo);
         setBgTwo(bgOne);
         setBgOne(bloodGlucose);
-      }, 300000);
+      }, 320000);
       return () => clearInterval(toggle);
     })
   
-  
-    useEffect(() => {
+    useEffect(() => { //collects and refreshes data every 5 minutes
       updateSGV();
       const timer = setInterval(() => {
         updateSGV();
-      }, 300000)
+      }, 320000)
   
       return () => clearInterval(timer);
   
     }, [])
   
+    const route = useRoute(); // allows you to get import the NS username and api key from connectNS.js 
+
+    function navToSettings() {
+        navigation.navigate('Settings')
+    }
+
     return (
       <View style={styles.container}>
+
+        <Button 
+         title="Settings"
+         onPress={navToSettings}
+        />
         
         <Text style={{ fontSize: 30, color: '#1f95bd' }}>Current Blood Glucose:</Text>
-        <Text style={{ fontSize: 50, color:'#08518e' }}>{bloodGlucose}</Text>
-        <Text style={{ fontSize: 30, color: '#1f95bd' }}>{trendLine}</Text>
+        <Text style={{ fontSize: 50, color:'#08518e' }}>{ bloodGlucose }</Text>
+        <Text style={{ fontSize: 30, color: '#1f95bd' }}>{ trendLine }</Text>
   
         <VictoryChart maxDomain={{ y: 250 }} minDomain={{ y: 40 }}>
          <VictoryLine data={graphData} x="quarter" y="earnings"/>

@@ -7,6 +7,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import sugarGraph from './screens/sugarGraph';
 import googleAuth from './screens/googleAuth';
 import connectNS from './screens/connectNS';
+import settings from './screens/settings';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +18,7 @@ export default function App() {
           <Stack.Screen name="GoogleAuth" component={googleAuth} />
           <Stack.Screen name="ConnectNS" component={connectNS} />
           <Stack.Screen name="SugarGraph" component={sugarGraph} />
+          <Stack.Screen name="Settings" component={settings} />
         </Stack.Navigator>
     </NavigationContainer>
   );
