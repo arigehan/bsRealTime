@@ -5,7 +5,7 @@ import * as WebBrowser from 'expo-web-browser';
 
 WebBrowser.maybeCompleteAuthSession();
 
-export default function connectNS({ navigation }) {
+export default function googleAuth({ navigation }) {
 
   const [accessToken, setAccessToken] = React.useState();
   const [userInfo, setUserInfo] = React.useState();
@@ -45,7 +45,7 @@ export default function connectNS({ navigation }) {
   }
 
   function navToNS() {
-    navigation.navigate('ConnectNS');
+    navigation.navigate('ConnectDexcom');
   }
 
   return (
@@ -53,7 +53,7 @@ export default function connectNS({ navigation }) {
         {showUserInfo()}
        <Button 
        title={accessToken ? (userInfo ? "Continue" : "Get User Data") : "Login"}
-       onPress={accessToken ? (userInfo? navToNS : getUserData) : () => { promptAsync({showInRecents: true}) }}
+       onPress={accessToken ? (userInfo ? navToNS : getUserData) : () => { promptAsync({showInRecents: true}) }}
        />
     </View>
     

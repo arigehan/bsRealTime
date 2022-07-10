@@ -11,17 +11,17 @@ export default function sugarGraph({ navigation }) {
     const [bgOne, setBgOne] = useState(0);
     const [bgTwo, setBgTwo] = useState(0);
     const [bgThree, setBgThree] = useState(0);
-  
-    const updateSGV = () => {
-      axios.get(`http://${route.params.nsUserName}.herokuapp.com/api/v1/entries/current`, { //cgmari
-        headers: {'API-SECRET': route.params.nsApiKey} //'80f33cadfe0ec3aa14574a4aa078a48ca4764a2b'
+
+    const updateSugar = () => {
+      axios.post(`https://share2.dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues?sessionId=${route.params.sessionID}&minutes=1440&maxCount=1`, { //cCount=1 is how many values you get, you can just get 3 so you don't need all the stupid saves!
+        headers: {} 
       })
         .then(response => {
           console.log(response.data)
           let data = response.data
   
-          setBloodGlucose(data[0].sgv);
-          setSugarTrend(data[0].trend);
+          setBloodGlucose(data[0].Value);
+          setSugarTrend(data[0].Trend);
         })
         .catch(error => {
           if (error.response) {
@@ -34,25 +34,7 @@ export default function sugarGraph({ navigation }) {
           }
         })
     };
-  
-    var trendLine; // names of trend 
-    if (sugarTrend === 1) {
-      trendLine = 'Going Up Fast';
-    } else if (sugarTrend === 2) {
-      trendLine = 'Going Up'
-    } else if (sugarTrend === 3) {
-      trendLine = 'Slightly Going Up'
-    } else if (sugarTrend === 4) {
-      trendLine = 'Flat'
-    } else if (sugarTrend === 5) {
-      trendLine = 'Slightly Going Down'
-    } else if (sugarTrend === 6) {
-      trendLine = 'Going Down'
-    } else if (sugarTrend === 7) {
-      trendLine = 'Going Down Fast'
-    } else {
-      trendLine = 'Unknown';
-    };
+
   
     const graphData = [ //array for data points of graph, y is time since that reading 
       { quarter: 15, earnings: bgThree },
@@ -71,16 +53,16 @@ export default function sugarGraph({ navigation }) {
     })
   
     useEffect(() => { //collects and refreshes data every 5 minutes
-      updateSGV();
+      updateSugar();
       const timer = setInterval(() => {
-        updateSGV();
+        updateSugar();
       }, 320000)
   
       return () => clearInterval(timer);
   
     }, [])
   
-    const route = useRoute(); // allows you to get import the NS username and api key from connectNS.js 
+    const route = useRoute(); // allows you to get import the Dexcom username and password from connectDexcom.js 
 
     function navToSettings() {
         navigation.navigate('Settings')
@@ -93,10 +75,10 @@ export default function sugarGraph({ navigation }) {
          title="Settings"
          onPress={navToSettings}
         />
-        
+
         <Text style={{ fontSize: 30, color: '#1f95bd' }}>Current Blood Glucose:</Text>
         <Text style={{ fontSize: 50, color:'#08518e' }}>{ bloodGlucose }</Text>
-        <Text style={{ fontSize: 30, color: '#1f95bd' }}>{ trendLine }</Text>
+        <Text style={{ fontSize: 30, color: '#1f95bd' }}>{ sugarTrend }</Text>
   
         <VictoryChart maxDomain={{ y: 250 }} minDomain={{ y: 40 }}>
          <VictoryLine data={graphData} x="quarter" y="earnings"/>

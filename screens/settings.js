@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 
-
 WebBrowser.maybeCompleteAuthSession();
 
 export default function settings({ navigation }) {
@@ -19,6 +18,7 @@ export default function settings({ navigation }) {
   return (
     <View style={styles.container}>
 
+        <Text>Low Settings:</Text>
         <View style={styles.SquareShapeView}>
             <Text>Low Notification (mg/dL)</Text>
             <TextInput
@@ -39,31 +39,34 @@ export default function settings({ navigation }) {
             <Text>Low Alarm Tone</Text>
         </View>
 
-      <Text>High Notification (mg/dL)</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="200 mg/dL"
-        onChangeText={newText => setHighNotify(newText)}
-        defaultValue={highNotify}
-        keyboardType="numeric"
-      />
-      <Button 
-       title="Save"
-       onPress={navToSugar}
-       />
-       <Text>High Alarm (mg/dL)</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="200 mg/dL"
-        onChangeText={newText => setHighAlarm(newText)}
-        defaultValue={highAlarm}
-        keyboardType="numeric"
-      />
-      <Button 
-       title="Save"
-       onPress={navToSugar}
-       />
-      <Text>Low Alarm Tone</Text>
+        <Text/> 
+        <Text/>
+        <Text/>
+
+        <Text>High Settings:</Text>
+        <View style={styles.SquareShapeView}>
+            <Text>High Notification (mg/dL)</Text>
+            <TextInput
+                style={styles.input}
+                placeholder="200 mg/dL"
+                onChangeText={newText => setHighNotify(newText)}
+                defaultValue={highNotify}
+                keyboardType="numeric"
+            />
+            <Text>High Alarm (mg/dL)</Text>
+            <TextInput
+                style={styles.input}
+                placeholder="250 mg/dL"
+                onChangeText={newText => setHighAlarm(newText)}
+                defaultValue={highAlarm}
+                keyboardType="numeric"
+            />
+            <Text>High Alarm Tone</Text>
+        </View>
+        <Button 
+            title="Save"
+            onPress={navToSugar}
+        />
 
     </View>
     
@@ -78,10 +81,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   SquareShapeView: {
-
     width: 330,
     height: 120,
-    backgroundColor: '#00BCD4'
-
-  },
+    backgroundColor: '#00BCD4',
+  }
 });
