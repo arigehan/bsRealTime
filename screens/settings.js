@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
-import * as WebBrowser from 'expo-web-browser';
-
-WebBrowser.maybeCompleteAuthSession();
+import { StyleSheet, Text, View, TextInput, Pressable } from 'react-native';
 
 export default function settings({ navigation }) {
 
@@ -17,6 +14,23 @@ export default function settings({ navigation }) {
 
   return (
     <View style={styles.container}>
+
+        <Text/> 
+        <Text/> 
+        <Text/>
+        <Text/> 
+        <Text/> 
+        <Text/> 
+        <Text/> 
+        <Text/> 
+        <Text/> 
+ 
+        <Pressable style={styles.button} onPress={navToSugar}>
+          <Text style={styles.buttonText}>Save</Text>
+        </Pressable>
+
+        <Text/> 
+        <Text/> 
 
         <Text>Low Settings:</Text>
         <View style={styles.SquareShapeView}>
@@ -41,7 +55,6 @@ export default function settings({ navigation }) {
 
         <Text/> 
         <Text/>
-        <Text/>
 
         <Text>High Settings:</Text>
         <View style={styles.SquareShapeView}>
@@ -63,10 +76,6 @@ export default function settings({ navigation }) {
             />
             <Text>High Alarm Tone</Text>
         </View>
-        <Button 
-            title="Save"
-            onPress={navToSugar}
-        />
 
     </View>
     
@@ -78,11 +87,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
   },
   SquareShapeView: {
     width: 330,
     height: 120,
-    backgroundColor: '#00BCD4',
+    backgroundColor: '#88cde0',
+  },
+  button: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 12,
+      paddingHorizontal: 32,
+      borderRadius: 4,
+      elevation: 3,
+      backgroundColor: '#88cde0',
+  },
+  buttonText: {
+      fontSize: 16,
+      lineHeight: 21,
+      fontWeight: 'bold',
+      letterSpacing: 0.25,
+      color: 'black',
   }
 });

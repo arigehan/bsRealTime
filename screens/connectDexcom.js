@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import axios from 'axios';
+import { useRoute } from '@react-navigation/native';
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default function connectDexcom({ navigation }) {
 
+  const route = useRoute();
   const [dexcomUserName, setDexcomUserName] = useState('');
   const [dexcomPassword, setDexcomPassword] = useState('');
   const [sessionID, setSessionID] = useState(0);
@@ -45,7 +47,8 @@ export default function connectDexcom({ navigation }) {
       navigation.navigate('SugarGraph', {
           dexcomUserName: dexcomUserName,
           dexcomPassword: dexcomPassword,
-          sessionID: sessionID
+          sessionID: sessionID,
+          accessToken: route.params.accessToken
       });
   }
 
@@ -54,16 +57,33 @@ export default function connectDexcom({ navigation }) {
     validationText = 'Login Successful'
   } else if (!sessionID) {
     validID = false;
+    validationText = ' '
   } else {
     validID = false;
-    validationText = 'Incorrect Loging Information'
+    validationText = 'Incorrect Login Information'
   }
 
   return (
     <View style={styles.container}>
 
-      <Text>Connect to your Dexcom Account:</Text>
-      <Text>Log in to your Clarity account to confirm these are correct.</Text>
+      <Text/>
+      <Text/>
+      <Text/>
+      <Text/>
+      <Image
+        style ={{width: '66.2%', height: '8%'}}
+        source = {require('../assets/Dexcom-logo.png')}
+      />
+      <Text/>
+      <Text/>
+      <Text/>
+      <Text style={styles.titleText}>Step Two (of Two):</Text>
+      <Text style={styles.titleText}>Connect your blood sugar data</Text>
+      <Text/> 
+      <Text style={styles.text}>All you need to do is log in to your Dexcom account.</Text>
+      <Text style={styles.smallBreakText}> </Text>
+      <Text style={styles.validationText}>{validationText}</Text>
+      <Text style={styles.smallBreakText}> </Text>
       <TextInput
         style={styles.input}
         placeholder="Dexcom Username"
@@ -77,14 +97,15 @@ export default function connectDexcom({ navigation }) {
         defaultValue={dexcomPassword}
       />
 
-      <Button 
-       title={validID ? "Continue" : "Connect"}
-       onPress={validID ? navToSugar : getSessionID}
-      />
+      <TouchableOpacity style={styles.button} onPress={validID ? navToSugar : getSessionID}>
+        <Text style={styles.buttonText}>{validID ? "Continue" : "Connect"}</Text>
+      </TouchableOpacity>
+
+      <Text/>
+      <Text/>
 
       <Text>Session ID: {sessionID}</Text>
-      <Text>{validationText}</Text>
-
+ 
     </View>
     
   );
@@ -95,12 +116,53 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
   },
   input: {
     height: 40,
-    margin: 12,
+    margin: 5,
     borderWidth: 1,
     padding: 10,
+  },
+  titleText: {
+    fontSize: 25,
+    lineHeight: 33,
+    fontWeight: 'bold',
+    letterSpacing: 0.3,
+    color: 'black',
+  },
+  text: {
+    fontSize: 17,
+    lineHeight: 21,
+    letterSpacing: 0.25,
+    color: 'black',
+  },
+  smallBreakText: {
+    fontSize: 5,
+    color: 'black',
+  },
+  validationText: {
+    fontSize: 17,
+    lineHeight: 21,
+    letterSpacing: 0.25,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  button: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 4,
+    elevation: 3,
+    backgroundColor: 'black'
+  },
+  buttonText: {
+      fontSize: 16,
+      lineHeight: 21,
+      fontWeight: 'bold',
+      letterSpacing: 0.25,
+      color: 'white',
+      alignItems: 'center',
+      justifyContent: 'center'
   }
 });

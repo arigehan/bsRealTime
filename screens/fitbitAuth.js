@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as WebBrowser from 'expo-web-browser';
 import { makeRedirectUri, useAuthRequest, ResponseType } from 'expo-auth-session';
-import { Button, StyleSheet, Platform, View, Text } from 'react-native';
+import { Pressable, StyleSheet, Platform, View, Text, Image } from 'react-native';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -17,6 +17,7 @@ const discovery = {
 export default function fitbitAuth({ navigation }) {
 
   const [accessToken, setAccessToken] = React.useState();
+  const [userName, setUserName] = React.useState();
 
 
   const [request, response, promptAsync] = useAuthRequest(
@@ -39,30 +40,43 @@ export default function fitbitAuth({ navigation }) {
     }
   }, [response]);
 
-  function showUserInfo() {
-    if (response) {
-
-        return (
-            <View style={styles.userInfo}>
-                <Text>Welcome, {accessToken}</Text>
-            </View>
-        );
-    }
-  }
-
-  function navToSleep() {
-    navigation.navigate('SleepDisplay', {
-      accessToken: accessToken
-    }); 
+  function navToDexcom() {
+    navigation.navigate('ConnectDexcom', {accessToken: accessToken});
   }
 
   return (
     <View style={styles.container}>
-    {showUserInfo()}
-    <Button 
-       title={response ? "Continue" : "Login"}
-       onPress={response ? navToSleep : () => { promptAsync({ useProxy }) }}
-    />
+      
+      <Text/>
+      <Text/>
+      <Text/>
+      <Text/>
+      <Text/>
+      <Text/>
+      <Text/>
+      <Text/>
+      <Image
+        style ={{width: '62%', height: '8%'}}
+        source = {require('../assets/Fitbit_logo.svg.png')}
+      />
+      <Text/>
+      <Text/>
+      <Text/>
+      <Text/>
+      <Text/>
+      <Text style={styles.titleText}>Step One (of Two):</Text>
+      <Text style={styles.titleText}>Connect Your Sleep Data</Text>
+      <Text/>
+      <Text style={styles.text}>All you need to do is log in to your Fitbit account.</Text>
+      <Text/>
+      <Text/>
+
+      <Pressable style={styles.button} onPress={accessToken ? navToDexcom : () => { promptAsync({ useProxy }) }}>
+        <Text style={styles.buttonText}>{accessToken ? 'Continue' : 'Login'}</Text>
+      </Pressable>
+
+      <Text/>
+      <Text style={styles.text}>{ response ? (accessToken ? 'Login Successful' : 'Login Failed, Try Again') : ' ' }</Text>
     </View>
   );
 }
@@ -72,11 +86,37 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
   },
-  userInfo: {
+  button: {
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 4,
+    elevation: 3,
+    backgroundColor: 'black'
+  },
+  buttonText: {
+      fontSize: 16,
+      lineHeight: 21,
+      fontWeight: 'bold',
+      letterSpacing: 0.25,
+      color: 'white',
+      alignItems: 'center',
+      justifyContent: 'center'
+  },
+  titleText: {
+    fontSize: 30,
+    lineHeight: 33,
+    fontWeight: 'bold',
+    letterSpacing: 0.3,
+    color: 'black',
+  },
+  text: {
+    fontSize: 18,
+    lineHeight: 21,
+    letterSpacing: 0.25,
+    color: 'black',
   }
 });
 
