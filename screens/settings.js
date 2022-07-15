@@ -39,7 +39,6 @@ export default function Settings({ navigation }) {
                 style={styles.input}
                 placeholder="80 mg/dL"
                 onChangeText={newText => setLowNotify(newText)}
-                defaultValue={lowNotify}
                 keyboardType="numeric"
             />
             <Text>Low Alarm (mg/dL)</Text>
@@ -47,7 +46,6 @@ export default function Settings({ navigation }) {
                 style={styles.input}
                 placeholder="65 mg/dL"
                 onChangeText={newText => setLowAlarm(newText)}
-                defaultValue={lowAlarm}
                 keyboardType="numeric"
             />
             <Text>Low Alarm Tone</Text>
@@ -67,7 +65,6 @@ export default function Settings({ navigation }) {
                 style={styles.input}
                 placeholder="200 mg/dL"
                 onChangeText={newText => setHighNotify(newText)}
-                defaultValue={highNotify}
                 keyboardType="numeric"
             />
             <Text>High Alarm (mg/dL)</Text>
@@ -75,7 +72,6 @@ export default function Settings({ navigation }) {
                 style={styles.input}
                 placeholder="250 mg/dL"
                 onChangeText={newText => setHighAlarm(newText)}
-                defaultValue={highAlarm}
                 keyboardType="numeric"
             />
             <Text>High Alarm Tone</Text>

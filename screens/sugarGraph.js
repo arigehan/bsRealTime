@@ -246,7 +246,7 @@ export default function SugarGraph({ navigation }) {
                       target: "labels",
                       mutation: (props) => {
                         return props.text === null ?
-                        { text: null } : { text: ({ datum }) => [datum.sugar, datum.stage] };
+                        { text: ' ' } : { text: ({ datum }) => [datum.sugar, datum.stage] };
                       }
                     }
                   ];
