@@ -17,7 +17,6 @@ const discovery = {
 export default function fitbitAuth({ navigation }) {
 
   const [accessToken, setAccessToken] = React.useState();
-  const [userName, setUserName] = React.useState();
 
 
   const [request, response, promptAsync] = useAuthRequest(
