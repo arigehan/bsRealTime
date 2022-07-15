@@ -2,12 +2,88 @@ import { StyleSheet, Text, View, TouchableHighlight, Image } from 'react-native'
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { VictoryScatter, VictoryChart } from "victory-native";
-import { useRoute } from '@react-navigation/native'
+import { VictoryScatter, VictoryChart, VictoryLabel } from "victory-native";
+import { DefaultTheme, useRoute } from '@react-navigation/native'
 
 export default function sugarGraph({ navigation }) {
     
-  //BLOOD SUGAR CONTENT
+    //SLEEP CONTENT
+
+    const [currentSleepStage, setCurrentSleepStage] = useState('Unavailible');
+    const [sleepOne, setSleepOne] = useState('Unavailible');
+    const [sleepTwo, setSleepTwo] = useState('Unavailible');
+    const [sleepThree, setSleepThree] = useState('Unavailible');
+    const [sleepFour, setSleepFour] = useState('Unavailible');
+    const [sleepFive, setSleepFive] = useState('Unavailible');
+    const [sleepSix, setSleepSix] = useState('Unavailible');
+    const [sleepSeven, setSleepSeven] = useState('Unavailible');
+    const [sleepEight, setSleepEight] = useState('Unavailible');
+    const [sleepNine, setSleepNine] = useState('Unavailible');
+  
+    const updateSleep = () => {
+      axios.get('https://api.fitbit.com/1.2/user/-/sleep/date/2022-07-13/2022-07-14.json', {
+        headers: {'Authorization': `Bearer ${route.params.accessToken}`} 
+      })
+        .then(response =>  {
+          console.log(JSON.stringify(response.data));
+          let datas = response.data;
+  
+          setCurrentSleepStage(datas.sleep[0].levels.data[0].level);
+          setSleepOne(datas.sleep[0].levels.data[1].level); 
+          setSleepTwo(datas.sleep[0].levels.data[2].level); 
+          setSleepThree(datas.sleep[0].levels.data[3].level); 
+          setSleepFour(datas.sleep[0].levels.data[4].level); 
+          setSleepFive(datas.sleep[0].levels.data[5].level); 
+          setSleepSix(datas.sleep[0].levels.data[6].level); 
+          setSleepSeven(datas.sleep[0].levels.data[7].level); 
+          setSleepEight(datas.sleep[0].levels.data[8].level); 
+          setSleepNine(datas.sleep[0].levels.data[9].level); 
+   
+          // sleep[what day from the range you want data from, 0 is most recent day]
+          // data[what sleep stage data you want from this sleep session]
+        })
+        .catch(error => {
+          if (error.response) {
+            console.log(error)
+          } else {
+            console.log(error.message)
+          }
+        })
+    };
+  
+    useEffect(() => { //collects and refreshes data every 5 minutes
+      updateSleep();
+      const timer = setInterval(() => {
+        updateSleep();
+      }, 320000)
+  
+      return () => clearInterval(timer);
+  
+    }, [])  
+
+    const sleepColor = (sleepState) => {
+      var backColor;
+      if (sleepState === 'awake') {
+        backColor = '#89d7e3';
+      } else if (sleepState === 'light') {
+        backColor = '#198cbb';
+      } else if (sleepState === 'deep') {
+        backColor = '#0d6da9';
+      } else if (sleepState === 'restless') {
+        backColor = '#3db3d4';
+      } else if (sleepState === 'rem') {
+        backColor = '#163c66';
+      } else if (sleepState === 'wake') {
+        backColor = '#ebf2f0';
+      } else if (sleepState === 'asleep') {
+        backColor = '#d0efee';
+      } else {
+        backColor = '#f7db9f';
+      }
+      return backColor;
+    }
+
+    //BLOOD SUGAR CONTENT
 
     const [bloodGlucose, setBloodGlucose] = useState(0);
     const [sugarTrend, setSugarTrend] = useState(0);
@@ -20,7 +96,7 @@ export default function sugarGraph({ navigation }) {
     const [bgSeven, setBgSeven] = useState(0);
     const [bgEight, setBgEight] = useState(0);
     const [bgNine, setBgNine] = useState(0);
-
+  
     const updateSugar = () => {
       axios.post(`https://share2.dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues?sessionId=${route.params.sessionID}&minutes=150&maxCount=12`, { //Count=1 is how many values you get, you can just get 3 so you don't need all the stupid saves!
         headers: {} 
@@ -52,25 +128,25 @@ export default function sugarGraph({ navigation }) {
           }
         })
     };
-
+  
     useEffect(() => {
       console.log("GRAPH DATA:")
       console.log(graphData);
     }, [graphData])
-
-    var graphData = [ //array for data points of graph, y is time since that reading 
-      { time: 0, sugar: bloodGlucose, amount: 1 },
-      { time: 5, sugar: bgOne, amount: 1 },
-      { time: 10, sugar: bgTwo, amount: 1 },
-      { time: 15, sugar: bgThree, amount: 1 },
-      { time: 20, sugar: bgFour, amount: 1 },
-      { time: 25, sugar: bgFive, amount: 1 },
-      { time: 30, sugar: bgSix, amount: 1 },
-      { time: 35, sugar: bgSeven, amount: 1 },
-      { time: 40, sugar: bgEight, amount: 1 },
-      { time: 45, sugar: bgNine, amount: 1 },
-    ];
   
+    var graphData = [ //array for data points of graph, y is time since that reading 
+      { time: 0, sugar: bloodGlucose, amount: 1, color: sleepColor(currentSleepStage) },
+      { time: 5, sugar: bgOne, amount: 1, color: sleepColor(sleepOne) },
+      { time: 10, sugar: bgTwo, amount: 1, color: sleepColor(sleepTwo) },
+      { time: 15, sugar: bgThree, amount: 1, color: sleepColor(sleepThree) },
+      { time: 20, sugar: bgFour, amount: 1, color: sleepColor(sleepFour) },
+      { time: 25, sugar: bgFive, amount: 1, color: sleepColor(sleepFive) },
+      { time: 30, sugar: bgSix, amount: 1, color: sleepColor(sleepSix) },
+      { time: 35, sugar: bgSeven, amount: 1, color: sleepColor(sleepSeven) },
+      { time: 40, sugar: bgEight, amount: 1, color: sleepColor(sleepEight) },
+      { time: 45, sugar: bgNine, amount: 1, color: sleepColor(sleepNine) },
+    ];
+    
     useEffect(() => { //collects and refreshes data every 5 minutes
       updateSugar();
       const timer = setInterval(() => {
@@ -78,13 +154,13 @@ export default function sugarGraph({ navigation }) {
       }, 320000)
       return () => clearInterval(timer);
     }, [])
-  
+    
     const route = useRoute(); // allows you to get import the Dexcom username and password from connectDexcom.js 
-
+  
     function navToSettings() {
       navigation.navigate('Settings')
     }
-
+  
     var sugarTrendDisplay;
     if (sugarTrend === 'Flat') {
       sugarTrendDisplay = 'Steady';
@@ -104,92 +180,41 @@ export default function sugarGraph({ navigation }) {
       sugarTrendDisplay = 'Trend Unknown';
     }
 
-
-    //SLEEP CONTENT
-
-    const [currentSleepStage, setCurrentSleepStage] = useState('Unavailible');
-    const [previousSleepStage, setPreviousSleepStage] = useState('Unavailible');
-  
-    const updateSleep = () => {
-      axios.get('https://api.fitbit.com/1.2/user/-/sleep/date/2022-07-13/2022-07-14.json', {
-        headers: {'Authorization': `Bearer ${route.params.accessToken}`} 
-      })
-        .then(response =>  {
-          console.log(JSON.stringify(response.data));
-          let datas = response.data;
-  
-          setCurrentSleepStage(datas.sleep[0].levels.data[0].level);
-          setPreviousSleepStage(datas.sleep[0].levels.data[3].level); 
-   
-          // sleep[what day from the range you want data from, 0 is most recent day]
-          // data[what sleep stage data you want from this sleep session]
-        })
-        .catch(error => {
-          if (error.response) {
-            console.log(error)
-          } else {
-            console.log(error.message)
-          }
-        })
-    };
-  
-    useEffect(() => { //collects and refreshes data every 5 minutes
-      updateSleep();
-      const timer = setInterval(() => {
-        updateSleep();
-      }, 320000)
-  
-      return () => clearInterval(timer);
-  
-    }, [])  
-
-    //Make this a function, return the color 
-    var currentBackColor = '#f7db9f';
-    if (currentSleepStage === 'awake') {
-      currentBackColor = '#89d7e3';
-    } else if (currentSleepStage === 'light') {
-      currentBackColor = '#198cbb';
-    } else if (currentSleepStage === 'deep') {
-      currentBackColor = '#0d6da9';
-    } else if (currentSleepStage === 'restless') {
-      currentBackColor = '#3db3d4';
-    } else if (currentSleepStage === 'rem') {
-      currentBackColor = '#163c66';
-    } else if (currentSleepStage === 'wake') {
-      currentBackColor = '#ebf2f0';
-    } else {
-      currentBackColor = '#f7db9f';
-    }
-
-    var previousBackColor = '#f7db9f';
-    if (previousSleepStage === 'awake') {
-      previousBackColor = '#89d7e3';
-    } else if (previousSleepStage === 'light') {
-      previousBackColor = '#198cbb';
-    } else if (previousSleepStage === 'deep') {
-      previousBackColor = '#0d6da9';
-    } else if (previousSleepStage === 'restless') {
-      previousBackColor = '#3db3d4';
-    } else if (previousSleepStage === 'rem') {
-      previousBackColor = '#163c66';
-    } else if (previousSleepStage === 'wake') {
-      previousBackColor = '#ebf2f0';
-    } else {
-      previousBackColor = '#f7db9f';
-    }
-
     return (
       <View style={styles.container}>
 
-        <View style={styles.rowContainer}>
-          <View style={styles.currentColor} backgroundColor={currentBackColor} >
-            <Text>{route.params.currentSleepStage}</Text>
+        {/* <View style={styles.rowContainer}>
+          <View style={styles.sleepBox} backgroundColor={sleepColor(currentSleepStage)} >
+            <Text>{currentSleepStage}</Text>
           </View>
-
-          <View style={styles.previousColor} backgroundColor={previousBackColor} >
-            <Text>{route.params.previousSleepStage}</Text>
+          <View style={styles.sleepBox} backgroundColor={sleepColor(sleepOne)} >
+            <Text>{sleepOne}</Text>
+          </View>        
+          <View style={styles.sleepBox} backgroundColor={sleepColor(sleepTwo)} >
+            <Text>{sleepTwo}</Text>
           </View>
-        </View>  
+          <View style={styles.sleepBox} backgroundColor={sleepColor(sleepThree)} >
+            <Text>{sleepThree}</Text>
+          </View>
+          <View style={styles.sleepBox} backgroundColor={sleepColor(sleepFour)} >
+            <Text>{sleepFour}</Text>
+          </View>
+          <View style={styles.sleepBox} backgroundColor={sleepColor(sleepFive)} >
+            <Text>{sleepFive}</Text>
+          </View>
+          <View style={styles.sleepBox} backgroundColor={sleepColor(sleepSix)} >
+            <Text>{sleepSix}</Text>
+          </View>
+          <View style={styles.sleepBox} backgroundColor={sleepColor(sleepSeven)} >
+            <Text>{sleepSeven}</Text>
+          </View>
+          <View style={styles.sleepBox} backgroundColor={sleepColor(sleepEight)} >
+            <Text>{sleepEight}</Text>
+          </View>
+          <View style={styles.sleepBox} backgroundColor={sleepColor(sleepNine)} >
+            <Text>{sleepNine}</Text>
+          </View>
+        </View>   */}
 
         <Text style={{ fontSize: 30, color: '#1f95bd' }}>Current Blood Glucose:</Text>
         <Text style={{ fontSize: 50, color:'#08518e' }}>{ bloodGlucose }</Text>
@@ -197,31 +222,36 @@ export default function sugarGraph({ navigation }) {
 
         <VictoryChart maxDomain={{ x: 45, y: 250 }} minDomain={{ x: 0, y: 40 }} >
           <VictoryScatter
-            style={{ data: { fill: "#08518e" }, labels: { fill: "black", fontSize: 16 } }} 
+            style={{ data: { fill:  ({ datum }) => datum.color }, labels: { fill: "#08518e", fontSize: 16 } }} 
             bubbleProperty="amount" 
-            minBubbleSize={10} 
+            minBubbleSize={15} 
             data={graphData} 
             x="time" 
             y="sugar"
-            //labels={({ datum }) => datum.sugar}
-            // events={[{
-            //   target: "data",
-            //   eventHandlers: {
-            //     onPress: () => {
-            //       return [
-            //         {
-            //           target: "labels",
-            //           mutation: (props) => {
-            //             //return props.text === 'hi' ?
-            //             return props.text === datum.sugar ?
-            //             //null : { text: 'hi' };
-            //             null : { text: ({ datum }) => datum.sugar };
-            //           }
-            //         }
-            //       ];
-            //     }
-            //   }
-            // }]}
+            labels={true}
+            labelComponent={
+              <VictoryLabel
+                y={-25}
+                dy={(({ datum }) => datum.sugar)}
+                text=' '
+                />
+            }
+             events={[{
+              target: "data",
+              eventHandlers: {
+                onPress: () => {
+                  return [
+                    {
+                      target: "labels",
+                      mutation: (props) => {
+                        return props.text === ' ' ?
+                        ' ' : { text: ({ datum }) => datum.sugar };
+                      }
+                    }
+                  ];
+                }
+              }
+            }]}
           />
         </VictoryChart>
 
@@ -262,13 +292,8 @@ export default function sugarGraph({ navigation }) {
       alignItems: 'center',
       justifyContent: 'center',
     },
-    currentColor: {
-      width: 33,
-      height: 216,
-      borderRadius: 7
-    },
-    previousColor: {
-      width: 33,
+    sleepBox: {
+      width: 32, //32 or 29
       height: 216,
       borderRadius: 7
     },
