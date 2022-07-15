@@ -135,16 +135,16 @@ export default function sugarGraph({ navigation }) {
     }, [graphData])
   
     var graphData = [ //array for data points of graph, y is time since that reading 
-      { time: 0, sugar: bloodGlucose, amount: 1, color: sleepColor(currentSleepStage) },
-      { time: 5, sugar: bgOne, amount: 1, color: sleepColor(sleepOne) },
-      { time: 10, sugar: bgTwo, amount: 1, color: sleepColor(sleepTwo) },
-      { time: 15, sugar: bgThree, amount: 1, color: sleepColor(sleepThree) },
-      { time: 20, sugar: bgFour, amount: 1, color: sleepColor(sleepFour) },
-      { time: 25, sugar: bgFive, amount: 1, color: sleepColor(sleepFive) },
-      { time: 30, sugar: bgSix, amount: 1, color: sleepColor(sleepSix) },
-      { time: 35, sugar: bgSeven, amount: 1, color: sleepColor(sleepSeven) },
-      { time: 40, sugar: bgEight, amount: 1, color: sleepColor(sleepEight) },
-      { time: 45, sugar: bgNine, amount: 1, color: sleepColor(sleepNine) },
+      { time: 0, sugar: bloodGlucose, amount: 1, color: sleepColor(currentSleepStage), stage: currentSleepStage },
+      { time: 5, sugar: bgOne, amount: 1, color: sleepColor(sleepOne), stage: sleepOne },
+      { time: 10, sugar: bgTwo, amount: 1, color: sleepColor(sleepTwo), stage: sleepTwo },
+      { time: 15, sugar: bgThree, amount: 1, color: sleepColor(sleepThree), stage: sleepThree },
+      { time: 20, sugar: bgFour, amount: 1, color: sleepColor(sleepFour), stage: sleepFour },
+      { time: 25, sugar: bgFive, amount: 1, color: sleepColor(sleepFive), stage: sleepFive },
+      { time: 30, sugar: bgSix, amount: 1, color: sleepColor(sleepSix), stage: sleepSix },
+      { time: 35, sugar: bgSeven, amount: 1, color: sleepColor(sleepSeven), stage: sleepSeven },
+      { time: 40, sugar: bgEight, amount: 1, color: sleepColor(sleepEight), stage: sleepEight },
+      { time: 45, sugar: bgNine, amount: 1, color: sleepColor(sleepNine), stage: sleepNine },
     ];
     
     useEffect(() => { //collects and refreshes data every 5 minutes
@@ -231,9 +231,10 @@ export default function sugarGraph({ navigation }) {
             labels={true}
             labelComponent={
               <VictoryLabel
-                y={-25}
+                y={270}
                 dy={(({ datum }) => datum.sugar)}
-                text=' '
+                text= ' '
+                verticalAnchor={({ text }) => text.length > 1 ? "start" : "middle"}
                 />
             }
              events={[{
@@ -244,8 +245,8 @@ export default function sugarGraph({ navigation }) {
                     {
                       target: "labels",
                       mutation: (props) => {
-                        return props.text === ' ' ?
-                        ' ' : { text: ({ datum }) => datum.sugar };
+                        return props.text === null ?
+                        { text: null } : { text: ({ datum }) => [datum.sugar, datum.stage] };
                       }
                     }
                   ];

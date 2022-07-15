@@ -51,6 +51,11 @@ export default function settings({ navigation }) {
                 keyboardType="numeric"
             />
             <Text>Low Alarm Tone</Text>
+            <TextInput //CHANGE THIS
+                style={styles.input}
+                placeholder="Ongoing Beeps"
+                defaultValue={lowAlarm}
+            />
         </View>
 
         <Text/> 
@@ -75,6 +80,11 @@ export default function settings({ navigation }) {
                 keyboardType="numeric"
             />
             <Text>High Alarm Tone</Text>
+            <TextInput //change this!!!
+                style={styles.input}
+                placeholder="Bells"
+                defaultValue={highAlarm}
+            />
         </View>
 
     </View>
