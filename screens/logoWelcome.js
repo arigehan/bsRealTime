@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {View, Image, StyleSheet, Pressable, Text} from 'react-native';
 
-export default function logoWelcome({ navigation }) {
+export default function LogoWelcome({ navigation }) {
 
     function navToFitbitAuth() {
       navigation.navigate('FitbitAuth')

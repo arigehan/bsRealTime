@@ -5,7 +5,7 @@ import axios from 'axios';
 import { VictoryScatter, VictoryChart, VictoryLabel } from "victory-native";
 import { DefaultTheme, useRoute } from '@react-navigation/native'
 
-export default function sugarGraph({ navigation }) {
+export default function SugarGraph({ navigation }) {
     
     //SLEEP CONTENT
 

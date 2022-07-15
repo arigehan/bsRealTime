@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Pressable } from 'react-native';
 
-export default function settings({ navigation }) {
+export default function Settings({ navigation }) {
 
   const [lowNotify, setLowNotify] = useState(80);
   const [lowAlarm, setLowAlarm] = useState(65);

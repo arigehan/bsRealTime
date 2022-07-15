@@ -6,7 +6,7 @@ import { useRoute } from '@react-navigation/native';
 
 WebBrowser.maybeCompleteAuthSession();
 
-export default function connectDexcom({ navigation }) {
+export default function ConnectDexcom({ navigation }) {
 
   const route = useRoute();
   const [dexcomUserName, setDexcomUserName] = useState('');

@@ -14,7 +14,7 @@ const discovery = {
   revocationEndpoint: 'https://api.fitbit.com/oauth2/revoke',
 };
 
-export default function fitbitAuth({ navigation }) {
+export default function FitbitAuth({ navigation }) {
 
   const [accessToken, setAccessToken] = React.useState();
 
