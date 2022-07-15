@@ -54,7 +54,6 @@ export default function settings({ navigation }) {
             <TextInput //CHANGE THIS
                 style={styles.input}
                 placeholder="Ongoing Beeps"
-                defaultValue={lowAlarm}
             />
         </View>
 
@@ -83,7 +82,6 @@ export default function settings({ navigation }) {
             <TextInput //change this!!!
                 style={styles.input}
                 placeholder="Bells"
-                defaultValue={highAlarm}
             />
         </View>
 
