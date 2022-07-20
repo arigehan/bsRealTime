@@ -9,19 +9,19 @@ export default function SugarGraph({ navigation }) {
     
     //SLEEP CONTENT
 
-    const [currentSleepStage, setCurrentSleepStage] = useState('Unavailible');
-    const [sleepOne, setSleepOne] = useState('Unavailible');
-    const [sleepTwo, setSleepTwo] = useState('Unavailible');
-    const [sleepThree, setSleepThree] = useState('Unavailible');
-    const [sleepFour, setSleepFour] = useState('Unavailible');
-    const [sleepFive, setSleepFive] = useState('Unavailible');
-    const [sleepSix, setSleepSix] = useState('Unavailible');
-    const [sleepSeven, setSleepSeven] = useState('Unavailible');
-    const [sleepEight, setSleepEight] = useState('Unavailible');
-    const [sleepNine, setSleepNine] = useState('Unavailible');
+    const [currentSleepStage, setCurrentSleepStage] = useState('Unavailable');
+    const [sleepOne, setSleepOne] = useState('Unavailable');
+    const [sleepTwo, setSleepTwo] = useState('Unavailable');
+    const [sleepThree, setSleepThree] = useState('Unavailable');
+    const [sleepFour, setSleepFour] = useState('Unavailable');
+    const [sleepFive, setSleepFive] = useState('Unavailable');
+    const [sleepSix, setSleepSix] = useState('Unavailable');
+    const [sleepSeven, setSleepSeven] = useState('Unavailable');
+    const [sleepEight, setSleepEight] = useState('Unavailable');
+    const [sleepNine, setSleepNine] = useState('Unavailable');
   
     const updateSleep = () => {
-      axios.get('https://api.fitbit.com/1.2/user/-/sleep/date/2022-07-13/2022-07-14.json', {
+      axios.get('https://api.fitbit.com/1.2/user/-/sleep/date/2022-07-19/2022-07-20.json', {
         headers: {'Authorization': `Bearer ${route.params.accessToken}`} 
       })
         .then(response =>  {
