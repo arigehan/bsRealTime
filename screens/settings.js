@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, Pressable } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Settings({ navigation }) {
 
@@ -8,7 +9,68 @@ export default function Settings({ navigation }) {
   const [highNotify, setHighNotify] = useState(200);
   const [highAlarm, setHighAlarm] = useState(250);
 
+  // Load in the settings from storage on app load
+  useEffect(() => {
+    async function getValues() {
+      try {
+        const lowNotifyVal = await AsyncStorage.getItem('lowNotify');
+        if (lowNotifyVal !== null) {
+          // We have data!!
+          setLowNotify(JSON.parse(lowNotifyVal));
+        }
+  
+        const lowAlarmVal = await AsyncStorage.getItem('lowAlarm');
+        if (lowAlarmVal !== null) {
+          // We have data!!
+          setLowAlarm(JSON.parse(lowAlarmVal));
+        }
+  
+        const highNotifyVal = await AsyncStorage.getItem('highNotify');
+        if (highNotifyVal !== null) {
+          // We have data!!
+          setHighNotify(JSON.parse(highNotifyVal));
+        }
+  
+        const highAlarmVal = await AsyncStorage.getItem('highAlarm');
+        if (highAlarmVal !== null) {
+          // We have data!!
+          setHighAlarm(JSON.parse(highAlarmVal));
+        }
+      } catch (error) {
+        // Error retrieving data
+      }
+    }
+    
+    getValues();
+
+  }, [])
+
+  function saveValues() {
+    AsyncStorage.setItem('lowNotify', JSON.stringify(lowNotify))
+    .catch((e) => {
+      console.log('Error: ' + JSON.stringify(e));
+    })
+
+    AsyncStorage.setItem('lowAlarm', JSON.stringify(lowAlarm))
+    .catch((e) => {
+      console.log('Error: ' + JSON.stringify(e));
+    })
+
+    AsyncStorage.setItem('highNotify', JSON.stringify(highNotify))
+    .catch((e) => {
+      console.log('Error: ' + JSON.stringify(e));
+    })
+
+    AsyncStorage.setItem('highAlarm', JSON.stringify(highAlarm))
+    .catch((e) => {
+      console.log('Error: ' + JSON.stringify(e));
+    })
+
+    navToSugar();
+  }
+
   function navToSugar() {
+
     navigation.navigate('SugarGraph');
   }
 
@@ -25,7 +87,7 @@ export default function Settings({ navigation }) {
         <Text/> 
         <Text/> 
  
-        <Pressable style={styles.button} onPress={navToSugar}>
+        <Pressable style={styles.button} onPress={saveValues}>
           <Text style={styles.buttonText}>Save</Text>
         </Pressable>
 
@@ -37,14 +99,14 @@ export default function Settings({ navigation }) {
             <Text>Low Notification (mg/dL)</Text>
             <TextInput
                 style={styles.input}
-                placeholder="80 mg/dL"
+                value={lowNotify}
                 onChangeText={newText => setLowNotify(newText)}
                 keyboardType="numeric"
             />
             <Text>Low Alarm (mg/dL)</Text>
             <TextInput
                 style={styles.input}
-                placeholder="65 mg/dL"
+                value={lowAlarm}
                 onChangeText={newText => setLowAlarm(newText)}
                 keyboardType="numeric"
             />
@@ -63,14 +125,14 @@ export default function Settings({ navigation }) {
             <Text>High Notification (mg/dL)</Text>
             <TextInput
                 style={styles.input}
-                placeholder="200 mg/dL"
+                value={highNotify}
                 onChangeText={newText => setHighNotify(newText)}
                 keyboardType="numeric"
             />
             <Text>High Alarm (mg/dL)</Text>
             <TextInput
                 style={styles.input}
-                placeholder="250 mg/dL"
+                value={highAlarm}
                 onChangeText={newText => setHighAlarm(newText)}
                 keyboardType="numeric"
             />

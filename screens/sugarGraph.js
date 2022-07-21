@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, TouchableHighlight, Image } from 'react-native'
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { VictoryScatter, VictoryChart, VictoryLabel } from "victory-native";
+import { VictoryScatter, VictoryChart, VictoryLabel, VictoryAxis } from "victory-native";
 import { DefaultTheme, useRoute } from '@react-navigation/native'
 
 export default function SugarGraph({ navigation }) {
@@ -96,6 +96,16 @@ export default function SugarGraph({ navigation }) {
     const [bgSeven, setBgSeven] = useState(0);
     const [bgEight, setBgEight] = useState(0);
     const [bgNine, setBgNine] = useState(0);
+    const [timeO, setTimeO] = useState(0);
+    const [timeOne, setTimeOne] = useState(0);
+    const [timeTwo, setTimeTwo] = useState(0);
+    const [timeThree, setTimeThree] = useState(0);
+    const [timeFour, setTimeFour] = useState(0);
+    const [timeFive, setTimeFive] = useState(0);
+    const [timeSix, setTimeSix] = useState(0);
+    const [timeSeven, setTimeSeven] = useState(0);
+    const [timeEight, setTimeEight] = useState(0);
+    const [timeNine, setTimeNine] = useState(0);
   
     const updateSugar = () => {
       axios.post(`https://share2.dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues?sessionId=${route.params.sessionID}&minutes=150&maxCount=12`, { //Count=1 is how many values you get, you can just get 3 so you don't need all the stupid saves!
@@ -116,6 +126,16 @@ export default function SugarGraph({ navigation }) {
           setBgSeven(data[7].Value);
           setBgEight(data[8].Value);
           setBgNine(data[9].Value);
+          setTimeO(data[0].WT);
+          setTimeOne(data[1].WT);
+          setTimeTwo(data[2].WT);
+          setTimeThree(data[3].WT);
+          setTimeFour(data[4].WT);
+          setTimeFive(data[5].WT);
+          setTimeSix(data[6].WT);
+          setTimeSeven(data[7].WT);
+          setTimeEight(data[8].WT);
+          setTimeNine(data[9].WT);
         })
         .catch(error => {
           if (error.response) {
@@ -128,6 +148,18 @@ export default function SugarGraph({ navigation }) {
           }
         })
     };
+
+    var numberPattern = /\d+/g;
+    var ntimeO = `${timeO}`.match( numberPattern );
+    var ntimeOne = `${timeOne}`.match( numberPattern );
+    var ntimeTwo = `${timeTwo}`.match( numberPattern );
+    var ntimeThree = `${timeThree}`.match( numberPattern );
+    var ntimeFour = `${timeFour}`.match( numberPattern );
+    var ntimeFive = `${timeFive}`.match( numberPattern );
+    var ntimeSix = `${timeSix}`.match( numberPattern );
+    var ntimeSeven = `${timeSeven}`.match( numberPattern );
+    var ntimeEight = `${timeEight}`.match( numberPattern );
+    var ntimeNine = `${timeNine}`.match( numberPattern );
   
     useEffect(() => {
       console.log("GRAPH DATA:")
@@ -135,16 +167,16 @@ export default function SugarGraph({ navigation }) {
     }, [graphData])
   
     var graphData = [ //array for data points of graph, y is time since that reading 
-      { time: 0, sugar: bloodGlucose, amount: 1, color: sleepColor(currentSleepStage), stage: currentSleepStage },
-      { time: 5, sugar: bgOne, amount: 1, color: sleepColor(sleepOne), stage: sleepOne },
-      { time: 10, sugar: bgTwo, amount: 1, color: sleepColor(sleepTwo), stage: sleepTwo },
-      { time: 15, sugar: bgThree, amount: 1, color: sleepColor(sleepThree), stage: sleepThree },
-      { time: 20, sugar: bgFour, amount: 1, color: sleepColor(sleepFour), stage: sleepFour },
-      { time: 25, sugar: bgFive, amount: 1, color: sleepColor(sleepFive), stage: sleepFive },
-      { time: 30, sugar: bgSix, amount: 1, color: sleepColor(sleepSix), stage: sleepSix },
-      { time: 35, sugar: bgSeven, amount: 1, color: sleepColor(sleepSeven), stage: sleepSeven },
-      { time: 40, sugar: bgEight, amount: 1, color: sleepColor(sleepEight), stage: sleepEight },
-      { time: 45, sugar: bgNine, amount: 1, color: sleepColor(sleepNine), stage: sleepNine },
+      { time: ntimeO, sugar: bloodGlucose, amount: 1, color: sleepColor(currentSleepStage), stage: currentSleepStage },
+      { time: ntimeOne, sugar: bgOne, amount: 1, color: sleepColor(sleepOne), stage: sleepOne },
+      { time: ntimeTwo, sugar: bgTwo, amount: 1, color: sleepColor(sleepTwo), stage: sleepTwo },
+      { time: ntimeThree, sugar: bgThree, amount: 1, color: sleepColor(sleepThree), stage: sleepThree },
+      { time: ntimeFour, sugar: bgFour, amount: 1, color: sleepColor(sleepFour), stage: sleepFour },
+      { time: ntimeFive, sugar: bgFive, amount: 1, color: sleepColor(sleepFive), stage: sleepFive },
+      { time: ntimeSix, sugar: bgSix, amount: 1, color: sleepColor(sleepSix), stage: sleepSix },
+      { time: ntimeSeven, sugar: bgSeven, amount: 1, color: sleepColor(sleepSeven), stage: sleepSeven },
+      { time: ntimeEight, sugar: bgEight, amount: 1, color: sleepColor(sleepEight), stage: sleepEight },
+      { time: ntimeNine, sugar: bgNine, amount: 1, color: sleepColor(sleepNine), stage: sleepNine },
     ];
     
     useEffect(() => { //collects and refreshes data every 5 minutes
@@ -178,6 +210,32 @@ export default function SugarGraph({ navigation }) {
       sugarTrendDisplay = 'Going Down Fast';
     } else {
       sugarTrendDisplay = 'Trend Unknown';
+    }
+
+    function msToTime(s) {
+      var ms = s % 1000;
+      s = (s - ms) / 1000;
+      var secs = s % 60;
+      s = (s - secs) / 60;
+      var mins = s % 60;
+      var hrs = (s - mins) / 60;
+      hrs = hrs - 4;
+
+      while (hrs >= 25) {
+        hrs = hrs - 24;
+      }
+
+      //make an option in settings!!!
+      if (hrs > 12) {
+        hrs = hrs - 12;
+      }
+
+      if (mins < 10) {
+        return hrs + ':0' + mins;
+      }
+      else {
+        return hrs + ':' + mins;
+      }
     }
 
     return (
@@ -216,11 +274,13 @@ export default function SugarGraph({ navigation }) {
           </View>
         </View>   */}
 
+        <Text>{ msToTime(ntimeO) }</Text>
         <Text style={{ fontSize: 30, color: '#1f95bd' }}>Current Blood Glucose:</Text>
         <Text style={{ fontSize: 50, color:'#08518e' }}>{ bloodGlucose }</Text>
         <Text style={{ fontSize: 30, color: '#1f95bd' }}>{ sugarTrendDisplay }</Text>
 
-        <VictoryChart maxDomain={{ x: 45, y: 250 }} minDomain={{ x: 0, y: 40 }} >
+        <VictoryChart maxDomain={{ y: 250 }} minDomain={{ y: 35 }}>
+          <VictoryAxis dependentAxis />
           <VictoryScatter
             style={{ data: { fill:  ({ datum }) => datum.color }, labels: { fill: "#08518e", fontSize: 16 } }} 
             bubbleProperty="amount" 
@@ -228,7 +288,7 @@ export default function SugarGraph({ navigation }) {
             data={graphData} 
             x="time" 
             y="sugar"
-            labels={true}
+            labels={() => 'true'}
             labelComponent={
               <VictoryLabel
                 y={270}
@@ -254,6 +314,10 @@ export default function SugarGraph({ navigation }) {
               }
             }]}
           />
+          <VictoryAxis
+            tickValues={[ntimeO, ntimeThree, ntimeSix, ntimeNine]}
+            tickFormat={(t) => `${msToTime(t)}`}
+          />
         </VictoryChart>
 
         <TouchableHighlight onPress={navToSettings}>
@@ -264,13 +328,10 @@ export default function SugarGraph({ navigation }) {
             />
           </View>
         </TouchableHighlight>
-        
+            
         <TouchableHighlight onPress={navToSettings}>
           <Text>Alarm Settings</Text>
         </TouchableHighlight>
-        <Text/>
-        <Text/>
-        <Text/>
 
       </View>
 
@@ -301,6 +362,6 @@ export default function SugarGraph({ navigation }) {
     rowContainer: {
       flexDirection: 'row',
       position: 'absolute'
-    }
+    },
   });
   
