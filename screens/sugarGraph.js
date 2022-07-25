@@ -59,7 +59,7 @@ export default function SugarGraph({ navigation }) {
   
       return () => clearInterval(timer);
   
-    }, [])  
+    }, []);  
 
     const sleepColor = (sleepState) => {
       var backColor;
@@ -81,7 +81,7 @@ export default function SugarGraph({ navigation }) {
         backColor = '#f7db9f';
       }
       return backColor;
-    }
+    };
 
     //BLOOD SUGAR CONTENT
 
@@ -112,8 +112,8 @@ export default function SugarGraph({ navigation }) {
         headers: {} 
       })
         .then(response => {
-          console.log(response.data)
-          let data = response.data
+          console.log(response.data);
+          let data = response.data;
                  
           setBloodGlucose(data[0].Value);
           setSugarTrend(data[0].Trend);
@@ -161,11 +161,6 @@ export default function SugarGraph({ navigation }) {
     var ntimeEight = `${timeEight}`.match( numberPattern );
     var ntimeNine = `${timeNine}`.match( numberPattern );
   
-    useEffect(() => {
-      console.log("GRAPH DATA:")
-      console.log(graphData);
-    }, [graphData])
-  
     var graphData = [ //array for data points of graph, y is time since that reading 
       { time: ntimeO, sugar: bloodGlucose, amount: 1, color: sleepColor(currentSleepStage), stage: currentSleepStage },
       { time: ntimeOne, sugar: bgOne, amount: 1, color: sleepColor(sleepOne), stage: sleepOne },
@@ -179,13 +174,18 @@ export default function SugarGraph({ navigation }) {
       { time: ntimeNine, sugar: bgNine, amount: 1, color: sleepColor(sleepNine), stage: sleepNine },
     ];
     
+    useEffect(() => {
+      console.log("GRAPH DATA:")
+      console.log(graphData);
+    }, [graphData]);
+
     useEffect(() => { //collects and refreshes data every 5 minutes
       updateSugar();
       const timer = setInterval(() => {
         updateSugar();
       }, 320000)
       return () => clearInterval(timer);
-    }, [])
+    }, []);
     
     const route = useRoute(); // allows you to get import the Dexcom username and password from connectDexcom.js 
   

@@ -1,10 +1,7 @@
-import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import googleAuth from '../screens/googleAuth';
 import sugarGraph from '../screens/sugarGraph';
-
-const Stack = createNativeStackNavigator();
 
 const screens = {
     //the first screen you put here will be the defualt

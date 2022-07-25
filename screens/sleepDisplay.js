@@ -41,7 +41,7 @@ export default function sleepDisplay({ navigation }) {
 
     return () => clearInterval(timer);
 
-  }, [])
+  }, []);
 
   function navToNS() {
     navigation.navigate('ConnectDexcom', {accessToken: accessToken});
@@ -49,7 +49,7 @@ export default function sleepDisplay({ navigation }) {
 
 
   //Make this a function, return the color 
-  var currentBackColor = '#f7db9f';
+  var currentBackColor;
   if (currentSleepStage === 'awake') {
     currentBackColor = '#89d7e3';
   } else if (currentSleepStage === 'light') {
@@ -66,7 +66,7 @@ export default function sleepDisplay({ navigation }) {
     currentBackColor = '#f7db9f';
   }
 
-  var previousBackColor = '#f7db9f';
+  var previousBackColor;
   if (previousSleepStage === 'awake') {
     previousBackColor = '#89d7e3';
   } else if (previousSleepStage === 'light') {

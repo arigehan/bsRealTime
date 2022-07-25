@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as WebBrowser from 'expo-web-browser';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { makeRedirectUri, useAuthRequest, ResponseType } from 'expo-auth-session';
 import { TouchableOpacity, StyleSheet, Platform, View, Text, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
