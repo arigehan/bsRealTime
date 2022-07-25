@@ -1,9 +1,9 @@
-import { StyleSheet, Text, View, TouchableHighlight, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { VictoryScatter, VictoryChart, VictoryLabel, VictoryAxis } from "victory-native";
-import { DefaultTheme, useRoute } from '@react-navigation/native'
+import { useRoute } from '@react-navigation/native'
 
 export default function SugarGraph({ navigation }) {
     
@@ -19,7 +19,7 @@ export default function SugarGraph({ navigation }) {
     const [sleepSeven, setSleepSeven] = useState('Unavailable');
     const [sleepEight, setSleepEight] = useState('Unavailable');
     const [sleepNine, setSleepNine] = useState('Unavailable');
-  
+
     const updateSleep = () => {
       axios.get('https://api.fitbit.com/1.2/user/-/sleep/date/2022-07-19/2022-07-20.json', {
         headers: {'Authorization': `Bearer ${route.params.accessToken}`} 
@@ -210,7 +210,7 @@ export default function SugarGraph({ navigation }) {
       sugarTrendDisplay = 'Going Down Fast';
     } else {
       sugarTrendDisplay = 'Trend Unknown';
-    }
+    }  
 
     function msToTime(s) {
       var ms = s % 1000;
@@ -226,7 +226,9 @@ export default function SugarGraph({ navigation }) {
       }
 
       //make an option in settings!!!
-      if (hrs > 12) {
+      if (route.params.timeToggle === true) {
+        hrs = hrs;
+      } else {
         hrs = hrs - 12;
       }
 
@@ -274,12 +276,11 @@ export default function SugarGraph({ navigation }) {
           </View>
         </View>   */}
 
-        <Text>{ msToTime(ntimeO) }</Text>
         <Text style={{ fontSize: 30, color: '#1f95bd' }}>Current Blood Glucose:</Text>
         <Text style={{ fontSize: 50, color:'#08518e' }}>{ bloodGlucose }</Text>
         <Text style={{ fontSize: 30, color: '#1f95bd' }}>{ sugarTrendDisplay }</Text>
 
-        <VictoryChart maxDomain={{ y: 250 }} minDomain={{ y: 35 }}>
+        <VictoryChart maxDomain={{ y: 300 }} minDomain={{ y: 39 }}>
           <VictoryAxis dependentAxis />
           <VictoryScatter
             style={{ data: { fill:  ({ datum }) => datum.color }, labels: { fill: "#08518e", fontSize: 16 } }} 
@@ -291,7 +292,7 @@ export default function SugarGraph({ navigation }) {
             labels={() => 'true'}
             labelComponent={
               <VictoryLabel
-                y={270}
+                y={295}
                 dy={(({ datum }) => datum.sugar)}
                 text= ' '
                 verticalAnchor={({ text }) => text.length > 1 ? "start" : "middle"}
@@ -305,8 +306,8 @@ export default function SugarGraph({ navigation }) {
                     {
                       target: "labels",
                       mutation: (props) => {
-                        return props.text === null ?
-                        { text: ' ' } : { text: ({ datum }) => [datum.sugar, datum.stage] };
+                        return props.text === ' ' ?
+                        { text: ({ datum }) => [datum.sugar, datum.stage] } : { text: ' ' };
                       }
                     }
                   ];
@@ -317,21 +318,24 @@ export default function SugarGraph({ navigation }) {
           <VictoryAxis
             tickValues={[ntimeO, ntimeThree, ntimeSix, ntimeNine]}
             tickFormat={(t) => `${msToTime(t)}`}
+            style={{
+              tickLabels: {fontSize: 15, padding: 29}
+            }}
           />
         </VictoryChart>
 
-        <TouchableHighlight onPress={navToSettings}>
+        <TouchableOpacity onPress={navToSettings}>
           <View>
             <Image
               style={styles.image}
               source = {require('../assets/settings.png')}
             />
           </View>
-        </TouchableHighlight>
+        </TouchableOpacity>
             
-        <TouchableHighlight onPress={navToSettings}>
+        <TouchableOpacity onPress={navToSettings}>
           <Text>Alarm Settings</Text>
-        </TouchableHighlight>
+        </TouchableOpacity>
 
       </View>
 

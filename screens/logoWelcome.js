@@ -1,5 +1,7 @@
 import * as React from 'react';
-import {View, Image, StyleSheet, Pressable, Text} from 'react-native';
+import { useState, useEffect } from 'react';
+import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LogoWelcome({ navigation }) {
 
@@ -7,55 +9,99 @@ export default function LogoWelcome({ navigation }) {
       navigation.navigate('FitbitAuth')
     }
 
+    function navToSugar() {
+        navigation.navigate('SugarGraph', {
+            accessToken: accessToken,
+            sessionID: sessionID,
+            timeToggle: timeToggle
+        })
+    }
+
+    const [sessionID, setSessionID] = useState('00000000-0000-0000-0000-000000000000');
+    const [accessToken, setAccessToken] = useState();
+    const [timeToggle, setTimeToggle] = useState();
+
+    useEffect(() => {
+        async function getValues() {
+          try {
+            const sessionID = await AsyncStorage.getItem('sessionID');
+            if (sessionID !== null) {
+              setSessionID(JSON.parse(sessionID));
+            }
+            const accessToken = await AsyncStorage.getItem('accessToken');
+            if (accessToken !== null) {
+                setAccessToken(JSON.parse(accessToken));
+            }            
+            const timeToggle = await AsyncStorage.getItem('timeToggle');
+            if (timeToggle !== null) {
+                setTimeToggle(JSON.parse(timeToggle));
+            }
+          } catch (error) {
+            // Error retrieving data
+          }
+        }
+        
+        getValues();
+    
+      }, [])
+
+
+
     return (
         <View style={styles.container}>
 
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
 
             <Image
                 style ={{width: '100%', height: '14%'}}
                 source = {require('../assets/DaiaLogoGifLong.gif')}
             />
-            <Text>  </Text>
-            <Text>  </Text>
+            <Text/>
+            <Text/>
             <Text style={styles.subTitle}>Live Better</Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
+            <Text/>
+            <Text/>
+            <Text/>
 
-            <Pressable style={styles.button} onPress={navToFitbitAuth}>
+            <TouchableOpacity style={styles.button} onPress={navToFitbitAuth}>
                 <Text style={styles.text}>Click Here To Start</Text>
-            </Pressable>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
-            <Text>  </Text>
+            </TouchableOpacity>
+
+            <Text/>
+
+            <TouchableOpacity style={styles.button} onPress={ (sessionID && accessToken) ? navToSugar : navToFitbitAuth}>
+                <Text style={styles.text}>Click Here To Return</Text>
+            </TouchableOpacity>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
+            <Text/>
 
         </View>
     );

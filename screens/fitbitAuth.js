@@ -1,7 +1,9 @@
 import * as React from 'react';
 import * as WebBrowser from 'expo-web-browser';
+import { useState, useEffect } from 'react';
 import { makeRedirectUri, useAuthRequest, ResponseType } from 'expo-auth-session';
-import { Pressable, StyleSheet, Platform, View, Text, Image } from 'react-native';
+import { TouchableOpacity, StyleSheet, Platform, View, Text, Image } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -16,8 +18,7 @@ const discovery = {
 
 export default function FitbitAuth({ navigation }) {
 
-  const [accessToken, setAccessToken] = React.useState();
-
+  const [accessToken, setAccessToken] = useState();
 
   const [request, response, promptAsync] = useAuthRequest(
     {
@@ -38,10 +39,21 @@ export default function FitbitAuth({ navigation }) {
       setAccessToken(response.authentication.accessToken);
     }
   }, [response]);
+  
 
   function navToDexcom() {
     navigation.navigate('ConnectDexcom', {accessToken: accessToken});
   }
+  
+    function saveValues() {
+  
+      AsyncStorage.setItem('accessToken', JSON.stringify(accessToken))
+      .catch((e) => {
+        console.log('Error: ' + JSON.stringify(e));
+      })
+  
+      navToDexcom();
+    }
 
   return (
     <View style={styles.container}>
@@ -70,9 +82,9 @@ export default function FitbitAuth({ navigation }) {
       <Text/>
       <Text/>
 
-      <Pressable style={styles.button} onPress={accessToken ? navToDexcom : () => { promptAsync({ useProxy }) }}>
+      <TouchableOpacity style={styles.button} onPress={accessToken ? saveValues : () => { promptAsync({ useProxy }) }}>
         <Text style={styles.buttonText}>{accessToken ? 'Continue' : 'Login'}</Text>
-      </Pressable>
+      </TouchableOpacity>
 
       <Text/>
       <Text style={styles.text}>{ response ? (accessToken ? 'Login Successful' : 'Login Failed, Try Again') : ' ' }</Text>

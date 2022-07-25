@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import axios from 'axios';
 import { useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -14,6 +15,36 @@ export default function ConnectDexcom({ navigation }) {
   const [sessionID, setSessionID] = useState(0);
   var validID = false;
   var validationText;
+
+  //NEW
+
+  useEffect(() => {
+    async function getValues() {
+      try {
+        const sessionID = await AsyncStorage.getItem('sessionID');
+        if (sessionID !== null) {
+          // We have data!!
+          setLowNotify(JSON.parse(sessionID));
+        }
+      } catch (error) {
+        // Error retrieving data
+      }
+    }
+    
+    getValues();
+
+  }, [])
+
+  function saveValues() {
+    AsyncStorage.setItem('sessionID', JSON.stringify(sessionID))
+    .catch((e) => {
+      console.log('Error: ' + JSON.stringify(e));
+    })
+
+    navToSugar();
+  }
+
+  //END OF NEW
   
   async function getSessionID() {
     var data = {
@@ -97,7 +128,7 @@ export default function ConnectDexcom({ navigation }) {
         defaultValue={dexcomPassword}
       />
 
-      <TouchableOpacity style={styles.button} onPress={validID ? navToSugar : getSessionID}>
+      <TouchableOpacity style={styles.button} onPress={validID ? saveValues : getSessionID}>
         <Text style={styles.buttonText}>{validID ? "Continue" : "Connect"}</Text>
       </TouchableOpacity>
 

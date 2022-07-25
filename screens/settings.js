@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, Pressable } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Switch } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Settings({ navigation }) {
 
-  const [lowNotify, setLowNotify] = useState(80);
-  const [lowAlarm, setLowAlarm] = useState(65);
-  const [highNotify, setHighNotify] = useState(200);
-  const [highAlarm, setHighAlarm] = useState(250);
+  const [lowNotify, setLowNotify] = useState('80');
+  const [lowAlarm, setLowAlarm] = useState('65');
+  const [highNotify, setHighNotify] = useState('200');
+  const [highAlarm, setHighAlarm] = useState('250');
+  const [timeToggle, setTimeToggle] = useState(false);
 
   // Load in the settings from storage on app load
   useEffect(() => {
@@ -35,6 +36,12 @@ export default function Settings({ navigation }) {
         if (highAlarmVal !== null) {
           // We have data!!
           setHighAlarm(JSON.parse(highAlarmVal));
+        }        
+        
+        const timeToggle = await AsyncStorage.getItem('timeToggle');
+        if (timeToggle !== null) {
+          // We have data!!
+          setTimeToggle(JSON.parse(timeToggle));
         }
       } catch (error) {
         // Error retrieving data
@@ -66,85 +73,138 @@ export default function Settings({ navigation }) {
       console.log('Error: ' + JSON.stringify(e));
     })
 
+    AsyncStorage.setItem('timeToggle', JSON.stringify(timeToggle))
+    .catch((e) => {
+      console.log('Error: ' + JSON.stringify(e));
+    })
+
     navToSugar();
   }
 
   function navToSugar() {
-
-    navigation.navigate('SugarGraph');
+    navigation.navigate('SugarGraph', {
+      timeToggle : timeToggle
+    });
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.scrollView}>
 
-        <Text/> 
-        <Text/> 
-        <Text/>
-        <Text/> 
-        <Text/> 
-        <Text/> 
-        <Text/> 
-        <Text/> 
-        <Text/> 
- 
-        <Pressable style={styles.button} onPress={saveValues}>
-          <Text style={styles.buttonText}>Save</Text>
-        </Pressable>
+      <View style={styles.container}>
 
-        <Text/> 
-        <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/>
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
 
-        <Text>Low Settings:</Text>
-        <View style={styles.SquareShapeView}>
-            <Text>Low Notification (mg/dL)</Text>
-            <TextInput
-                style={styles.input}
-                value={lowNotify}
-                onChangeText={newText => setLowNotify(newText)}
-                keyboardType="numeric"
-            />
-            <Text>Low Alarm (mg/dL)</Text>
-            <TextInput
-                style={styles.input}
-                value={lowAlarm}
-                onChangeText={newText => setLowAlarm(newText)}
-                keyboardType="numeric"
-            />
-            <Text>Low Alarm Tone</Text>
-            <TextInput //CHANGE THIS
-                style={styles.input}
-                placeholder="Ongoing Beeps"
-            />
-        </View>
+          <Text>Low Settings:</Text>
+          <View style={styles.SquareShapeView}>
+              <Text>Low Notification (mg/dL)</Text>
+              <TextInput
+                  style={styles.input}
+                  value={lowNotify}
+                  onChangeText={newText => setLowNotify(newText)}
+                  keyboardType="numeric"
+              />
+              <Text>Low Alarm (mg/dL)</Text>
+              <TextInput
+                  style={styles.input}
+                  value={lowAlarm}
+                  onChangeText={newText => setLowAlarm(newText)}
+                  keyboardType="numeric"
+              />
+              <Text>Low Alarm Tone</Text>
+              <TextInput //CHANGE THIS
+                  style={styles.input}
+                  placeholder="Ongoing Beeps"
+              />
+          </View>
 
-        <Text/> 
-        <Text/>
+          <Text/> 
 
-        <Text>High Settings:</Text>
-        <View style={styles.SquareShapeView}>
-            <Text>High Notification (mg/dL)</Text>
-            <TextInput
-                style={styles.input}
-                value={highNotify}
-                onChangeText={newText => setHighNotify(newText)}
-                keyboardType="numeric"
-            />
-            <Text>High Alarm (mg/dL)</Text>
-            <TextInput
-                style={styles.input}
-                value={highAlarm}
-                onChangeText={newText => setHighAlarm(newText)}
-                keyboardType="numeric"
-            />
-            <Text>High Alarm Tone</Text>
-            <TextInput //change this!!!
-                style={styles.input}
-                placeholder="Bells"
-            />
-        </View>
+          <Text>High Settings:</Text>
+          <View style={styles.SquareShapeView}>
+              <Text>High Notification (mg/dL)</Text>
+              <TextInput
+                  style={styles.input}
+                  value={highNotify}
+                  onChangeText={newText => setHighNotify(newText)}
+                  keyboardType="numeric"
+              />
+              <Text>High Alarm (mg/dL)</Text>
+              <TextInput
+                  style={styles.input}
+                  value={highAlarm}
+                  onChangeText={newText => setHighAlarm(newText)}
+                  keyboardType="numeric"
+              />
+              <Text>High Alarm Tone</Text>
+              <TextInput //change this!!!
+                  style={styles.input}
+                  placeholder="Bells"
+              />
+          </View>
 
-    </View>
-    
+          <Text/> 
+          <Text/> 
+          <Text/> 
+
+          <View style={styles.rowContainer}>
+            <Text style={{ fontSize: 20, color: '#08518e' }}>12 Hour Time       </Text>
+            <Switch
+              trackColor={{false: '#88cde0', true: '#88cde0'}}
+              thumbColor='#08518e'
+              ios_backgroundColor='#88cde0'
+              onValueChange={(value) => setTimeToggle(value)}
+              value={timeToggle}
+            />
+            <Text style={{ fontSize: 20, color: '#08518e' }}>       24 Hour Time</Text>
+          </View>
+
+          <Text/> 
+          <Text/> 
+          <Text/> 
+
+          <TouchableOpacity style={styles.button} onPress={saveValues}>
+            <Text style={styles.buttonText}>Save</Text>
+          </TouchableOpacity>
+
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+          <Text/> 
+
+
+      </View>
+
+    </ScrollView>
   );
 }
 
@@ -174,5 +234,12 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       letterSpacing: 0.25,
       color: 'black',
-  }
+  },
+  scrollView: {
+    marginHorizontal: 2,    
+    backgroundColor: '#fff',
+  },
+  rowContainer: {
+    flexDirection: 'row',
+  },
 });
