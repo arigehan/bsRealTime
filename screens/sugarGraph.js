@@ -6,7 +6,9 @@ import * as React from 'react';
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { VictoryScatter, VictoryChart, VictoryLabel, VictoryAxis } from "victory-native";
-import { useRoute } from '@react-navigation/native'
+import { useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 //NOTIFICATION 
 Notifications.setNotificationHandler({
@@ -186,8 +188,11 @@ export default function SugarGraph({ navigation }) {
         })
 
         //NOTIFICATION
-        if (bloodGlucose >= 180) { //set this value to the value from settings 
-          sendPushNotification(expoPushToken);
+        if (bloodGlucose >= 150) { //change it so it is the settings that change this value
+          sendHighNotification(expoPushToken);
+        //} else if (bloodGlucose <= route.params.lowNotify) {
+        } else if (bloodGlucose <= 80) {
+          sendLowNotification(expoPushToken);
         }
 
     };
@@ -322,7 +327,6 @@ export default function SugarGraph({ navigation }) {
             <Text>{sleepNine}</Text>
           </View>
         </View>   */}
-
         <Text style={{ fontSize: 30, color: '#1f95bd' }}>Current Blood Glucose:</Text>
         <Text style={{ fontSize: 50, color:'#08518e' }}>{ bloodGlucose }</Text>
         <Text style={{ fontSize: 30, color: '#1f95bd' }}>{ sugarTrendDisplay }</Text>
@@ -390,13 +394,31 @@ export default function SugarGraph({ navigation }) {
   };
 
 //NOTIFICATION
-  async function sendPushNotification(expoPushToken) {
+async function sendHighNotification(expoPushToken) {
   const message = {
     to: expoPushToken,
     sound: 'default',
-    title: 'Sugar Updated',
-    body: 'Are you high? (yes bc you fried your insulin dumbass',
-    data: { someData: 'goes here' },
+    title: 'High Blood Sugar Notification',
+    body: 'Your sugar is elevated',
+  };
+
+  await fetch('https://exp.host/--/api/v2/push/send', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Accept-encoding': 'gzip, deflate',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(message),
+  });
+}
+
+async function sendLowNotification(expoPushToken) {
+  const message = {
+    to: expoPushToken,
+    sound: 'default',
+    title: 'Low Blood Sugar Notification',
+    body: 'Your sugar is low',
   };
 
   await fetch('https://exp.host/--/api/v2/push/send', {
