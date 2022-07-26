@@ -218,18 +218,22 @@ export default function SugarGraph({ navigation }) {
       var secs = s % 60;
       s = (s - secs) / 60;
       var mins = s % 60;
-      var hrs = (s - mins) / 60;
-      hrs = hrs - 4;
+      var hours = (s - mins) / 60;
 
-      while (hrs >= 25) {
-        hrs = hrs - 24;
+      while (hours >= 25) {
+        hours = hours - 24;
       }
 
-      //make an option in settings!!!
-      if (route.params.timeToggle === true) {
-        hrs = hrs;
+      //probably still needs to be fixed
+      if (route.params.timeToggle === true) {        
+        var hrs = hours - 4;
       } else {
-        hrs = hrs - 12;
+        if (hours >= 13) {
+          var hrs = hours - 16;
+        }
+        else {
+          var hrs = hours - 4;
+        }
       }
 
       if (mins < 10) {
