@@ -1,14 +1,11 @@
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
-
 import { StyleSheet, Text, View, TouchableOpacity, Image, Platform, Button } from 'react-native';
 import * as React from 'react';
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { VictoryScatter, VictoryChart, VictoryLabel, VictoryAxis } from "victory-native";
 import { useRoute } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 
 //NOTIFICATION 
 Notifications.setNotificationHandler({
@@ -20,6 +17,7 @@ Notifications.setNotificationHandler({
 });
 
 export default function SugarGraph({ navigation }) {
+
   //NOTIFICATION 
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState(false);
@@ -122,7 +120,7 @@ export default function SugarGraph({ navigation }) {
       return backColor;
     };
 
-    //BLOOD SUGAR CONTENT
+    //BLOOD SUGAR CONTENT  
 
     const [bloodGlucose, setBloodGlucose] = useState(0);
     const [sugarTrend, setSugarTrend] = useState(0);
@@ -145,7 +143,7 @@ export default function SugarGraph({ navigation }) {
     const [timeSeven, setTimeSeven] = useState(0);
     const [timeEight, setTimeEight] = useState(0);
     const [timeNine, setTimeNine] = useState(0);
-  
+      
     const updateSugar = () => {
       axios.post(`https://share2.dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues?sessionId=${route.params.sessionID}&minutes=150&maxCount=12`, { //Count=1 is how many values you get, you can just get 3 so you don't need all the stupid saves!
         headers: {} 
@@ -188,10 +186,10 @@ export default function SugarGraph({ navigation }) {
         })
 
         //NOTIFICATION
-        if (bloodGlucose >= 150) { //change it so it is the settings that change this value
+        //only works if i refresh this, not automatic...
+        if (bloodGlucose >= parseInt(route.params.highNotify)) { 
           sendHighNotification(expoPushToken);
-        //} else if (bloodGlucose <= route.params.lowNotify) {
-        } else if (bloodGlucose <= 80) {
+        } else if (bloodGlucose <= parseInt(route.params.lowNotify)) {
           sendLowNotification(expoPushToken);
         }
 
@@ -238,7 +236,13 @@ export default function SugarGraph({ navigation }) {
     const route = useRoute(); // allows you to get import the Dexcom username and password from connectDexcom.js 
   
     function navToSettings() {
-      navigation.navigate('Settings')
+      navigation.navigate('Settings',
+      {
+        dexcomUserName: route.params.dexcomUserName,
+        dexcomPassword: route.params.dexcomPassword,
+        sessionID: route.params.sessionID,
+        accessToken: route.params.accessToken
+      })
     }
   
     var sugarTrendDisplay;
@@ -294,6 +298,8 @@ export default function SugarGraph({ navigation }) {
 
     return (
       <View style={styles.container}>
+        <Text>{parseInt(route.params.highNotify)}</Text>
+        <Text>{parseInt(route.params.lowNotify)}</Text>
         {/* 
         <View style={styles.rowContainer}>
           <View style={styles.sleepBox} backgroundColor={sleepColor(currentSleepStage)} >

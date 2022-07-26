@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Switch } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRoute } from '@react-navigation/native';
 
 export default function Settings({ navigation }) {
 
+  const route = useRoute();
   const [lowNotify, setLowNotify] = useState('80');
   const [lowAlarm, setLowAlarm] = useState('65');
   const [highNotify, setHighNotify] = useState('200');
@@ -83,7 +85,13 @@ export default function Settings({ navigation }) {
 
   function navToSugar() {
     navigation.navigate('SugarGraph', {
-      timeToggle : timeToggle
+      timeToggle : timeToggle,
+      highNotify : highNotify,
+      lowNotify : lowNotify,
+      dexcomUserName: route.params.dexcomUserName,
+      dexcomPassword: route.params.dexcomPassword,
+      sessionID: route.params.sessionID,
+      accessToken: route.params.accessToken
     });
   }
 

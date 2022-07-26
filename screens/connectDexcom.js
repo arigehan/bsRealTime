@@ -41,7 +41,7 @@ export default function ConnectDexcom({ navigation }) {
       console.log('Error: ' + JSON.stringify(e));
     })
 
-    navToSugar();
+    navToSettings();
   }
 
   //END OF NEW
@@ -74,8 +74,8 @@ export default function ConnectDexcom({ navigation }) {
     });
     }
 
-    function navToSugar() {
-      navigation.navigate('SugarGraph', {
+    function navToSettings() {
+      navigation.navigate('Settings', {
           dexcomUserName: dexcomUserName,
           dexcomPassword: dexcomPassword,
           sessionID: sessionID,
