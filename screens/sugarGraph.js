@@ -1,6 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
-import { StyleSheet, Text, View, TouchableOpacity, Image, Platform, Button } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, Platform } from 'react-native';
 import * as React from 'react';
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
@@ -187,13 +187,22 @@ export default function SugarGraph({ navigation }) {
 
         //NOTIFICATION
         //only works if i refresh this, not automatic...
-        if (bloodGlucose >= parseInt(route.params.highNotify)) { 
-          sendHighNotification(expoPushToken);
-        } else if (bloodGlucose <= parseInt(route.params.lowNotify)) {
-          sendLowNotification(expoPushToken);
-        }
+        // if (bloodGlucose >= parseInt(route.params.highNotify)) { 
+        //   sendHighNotification(expoPushToken);
+        // } else if (bloodGlucose <= parseInt(route.params.lowNotify)) {
+        //   sendLowNotification(expoPushToken);
+        // }
 
     };
+
+    const sendNotification = () => {
+      if (bloodGlucose >= route.params.highNotify) { 
+        console.log('sending high notify');
+        sendHighNotification(expoPushToken);
+      } else if (bloodGlucose <= route.params.lowNotify) {
+        sendLowNotification(expoPushToken);
+      }
+    }
 
     var numberPattern = /\d+/g;
     var ntimeO = `${timeO}`.match( numberPattern );
@@ -229,10 +238,14 @@ export default function SugarGraph({ navigation }) {
       updateSugar();
       const timer = setInterval(() => {
         updateSugar();
-      }, 320000)
+      }, 320000) //320000 is 5 minutes
       return () => clearInterval(timer);
     }, []);
     
+    useEffect(() => { //collects and refreshes data every 5 minutes
+      sendNotification();
+    }, [bloodGlucose, expoPushToken]);
+        
     const route = useRoute(); // allows you to get import the Dexcom username and password from connectDexcom.js 
   
     function navToSettings() {
@@ -272,19 +285,27 @@ export default function SugarGraph({ navigation }) {
       var mins = s % 60;
       var hours = (s - mins) / 60;
 
-      while (hours >= 25) {
-        hours = hours - 24;
+      while (hours >= 24) {
+        var hours = hours - 24;
       }
 
       //probably still needs to be fixed
       if (route.params.timeToggle === true) {        
         var hrs = hours - 4;
       } else {
-        if (hours >= 13) {
-          var hrs = hours - 16;
-        }
-        else {
-          var hrs = hours - 4;
+          if (hours >= 13) {
+            var hrs = hours - 16;
+          }
+          else {
+            var hrs = hours - 4;
+          }
+      }
+
+      while (hrs <= 0) {
+        if (route.params.timeToggle === true) {        
+          hrs = hrs + 24;
+        } else {
+          hrs = hrs + 12;
         }
       }
 
@@ -408,7 +429,7 @@ async function sendHighNotification(expoPushToken) {
     body: 'Your sugar is elevated',
   };
 
-  await fetch('https://exp.host/--/api/v2/push/send', {
+  let res = await fetch('https://exp.host/--/api/v2/push/send', {
     method: 'POST',
     headers: {
       Accept: 'application/json',
