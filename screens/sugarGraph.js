@@ -6,6 +6,7 @@ import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { VictoryScatter, VictoryChart, VictoryLabel, VictoryAxis } from "victory-native";
 import { useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 //NOTIFICATION 
 Notifications.setNotificationHandler({
@@ -17,6 +18,45 @@ Notifications.setNotificationHandler({
 });
 
 export default function SugarGraph({ navigation }) {
+
+  //Pulling data from settings
+  const [lowNotify, setLowNotify] = useState('80');
+  const [highNotify, setHighNotify] = useState('200');
+  const [timeToggle, setTimeToggle] = useState(false);
+  const [accessToken, setAccessToken] = useState();
+  const [sessionID, setSessionID] = useState(0);
+
+  useEffect(() => {
+    async function getValues() {
+      try {
+        const highNotify = await AsyncStorage.getItem('highNotify');
+        if (highNotify !== null) {
+          setHighNotify(JSON.parse(highNotify));
+        }            
+        const lowNotify = await AsyncStorage.getItem('lowNotify');
+        if (lowNotify !== null) {
+          setLowNotify(JSON.parse(lowNotify));
+        }
+        const timeToggle = await AsyncStorage.getItem('timeToggle');
+        if (timeToggle !== null) {
+          setTimeToggle(JSON.parse(timeToggle));
+        }         
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        if (accessToken !== null) {
+          setAccessToken(JSON.parse(accessToken));
+        }                    
+        const sessionID = await AsyncStorage.getItem('sessionID');
+        if (sessionID !== null) {
+          setSessionID(JSON.parse(sessionID));
+        }            
+      } catch (error) {
+        // Error retrieving data
+      }
+    }
+    
+    getValues();
+
+  }, [])
 
   //NOTIFICATION 
   const [expoPushToken, setExpoPushToken] = useState('');
@@ -46,20 +86,20 @@ export default function SugarGraph({ navigation }) {
     
     //SLEEP CONTENT
 
-    const [currentSleepStage, setCurrentSleepStage] = useState('Unavailable');
-    const [sleepOne, setSleepOne] = useState('Unavailable');
-    const [sleepTwo, setSleepTwo] = useState('Unavailable');
-    const [sleepThree, setSleepThree] = useState('Unavailable');
-    const [sleepFour, setSleepFour] = useState('Unavailable');
-    const [sleepFive, setSleepFive] = useState('Unavailable');
-    const [sleepSix, setSleepSix] = useState('Unavailable');
-    const [sleepSeven, setSleepSeven] = useState('Unavailable');
-    const [sleepEight, setSleepEight] = useState('Unavailable');
-    const [sleepNine, setSleepNine] = useState('Unavailable');
+    const [currentSleepStage, setCurrentSleepStage] = useState(' ');
+    const [sleepOne, setSleepOne] = useState(' ');
+    const [sleepTwo, setSleepTwo] = useState(' ');
+    const [sleepThree, setSleepThree] = useState(' ');
+    const [sleepFour, setSleepFour] = useState(' ');
+    const [sleepFive, setSleepFive] = useState(' ');
+    const [sleepSix, setSleepSix] = useState(' ');
+    const [sleepSeven, setSleepSeven] = useState(' ');
+    const [sleepEight, setSleepEight] = useState(' ');
+    const [sleepNine, setSleepNine] = useState(' ');
 
     const updateSleep = () => {
       axios.get('https://api.fitbit.com/1.2/user/-/sleep/date/2022-07-19/2022-07-20.json', {
-        headers: {'Authorization': `Bearer ${route.params.accessToken}`} 
+        headers: {'Authorization': `Bearer ${accessToken}`} 
       })
         .then(response =>  {
           console.log(JSON.stringify(response.data));
@@ -96,7 +136,7 @@ export default function SugarGraph({ navigation }) {
   
       return () => clearInterval(timer);
   
-    }, []);  
+    }, [accessToken]);  
 
     const sleepColor = (sleepState) => {
       var backColor;
@@ -145,7 +185,7 @@ export default function SugarGraph({ navigation }) {
     const [timeNine, setTimeNine] = useState(0);
       
     const updateSugar = () => {
-      axios.post(`https://share2.dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues?sessionId=${route.params.sessionID}&minutes=150&maxCount=12`, { //Count=1 is how many values you get, you can just get 3 so you don't need all the stupid saves!
+      axios.post(`https://share2.dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues?sessionId=${sessionID}&minutes=150&maxCount=12`, { //Count=1 is how many values you get, you can just get 3 so you don't need all the stupid saves!
         headers: {} 
       })
         .then(response => {
@@ -184,22 +224,13 @@ export default function SugarGraph({ navigation }) {
             console.log(error.message)
           }
         })
-
-        //NOTIFICATION
-        //only works if i refresh this, not automatic...
-        // if (bloodGlucose >= parseInt(route.params.highNotify)) { 
-        //   sendHighNotification(expoPushToken);
-        // } else if (bloodGlucose <= parseInt(route.params.lowNotify)) {
-        //   sendLowNotification(expoPushToken);
-        // }
-
     };
 
     const sendNotification = () => {
-      if (bloodGlucose >= route.params.highNotify) { 
+      if (bloodGlucose >= highNotify) { 
         console.log('sending high notify');
         sendHighNotification(expoPushToken);
-      } else if (bloodGlucose <= route.params.lowNotify) {
+      } else if (bloodGlucose <= lowNotify && bloodGlucose !== 0) {
         sendLowNotification(expoPushToken);
       }
     }
@@ -240,22 +271,16 @@ export default function SugarGraph({ navigation }) {
         updateSugar();
       }, 320000) //320000 is 5 minutes
       return () => clearInterval(timer);
-    }, []);
+    }, [sessionID]);
     
-    useEffect(() => { //collects and refreshes data every 5 minutes
+    useEffect(() => { //triggers notification when you get new bs value or the push token
       sendNotification();
     }, [bloodGlucose, expoPushToken]);
         
     const route = useRoute(); // allows you to get import the Dexcom username and password from connectDexcom.js 
   
     function navToSettings() {
-      navigation.navigate('Settings',
-      {
-        dexcomUserName: route.params.dexcomUserName,
-        dexcomPassword: route.params.dexcomPassword,
-        sessionID: route.params.sessionID,
-        accessToken: route.params.accessToken
-      })
+      navigation.navigate('Settings')
     }
   
     var sugarTrendDisplay;
@@ -290,7 +315,7 @@ export default function SugarGraph({ navigation }) {
       }
 
       //probably still needs to be fixed
-      if (route.params.timeToggle === true) {        
+      if (timeToggle === true) {        
         var hrs = hours - 4;
       } else {
           if (hours >= 13) {
@@ -302,7 +327,7 @@ export default function SugarGraph({ navigation }) {
       }
 
       while (hrs <= 0) {
-        if (route.params.timeToggle === true) {        
+        if (timeToggle === true) {        
           hrs = hrs + 24;
         } else {
           hrs = hrs + 12;
@@ -319,8 +344,9 @@ export default function SugarGraph({ navigation }) {
 
     return (
       <View style={styles.container}>
-        <Text>{parseInt(route.params.highNotify)}</Text>
-        <Text>{parseInt(route.params.lowNotify)}</Text>
+            <Text>{sessionID}</Text>
+            <Text>{highNotify}</Text>
+            <Text>{accessToken}</Text>
         {/* 
         <View style={styles.rowContainer}>
           <View style={styles.sleepBox} backgroundColor={sleepColor(currentSleepStage)} >
@@ -370,7 +396,7 @@ export default function SugarGraph({ navigation }) {
             labels={() => 'true'}
             labelComponent={
               <VictoryLabel
-                y={295}
+                y={280}
                 dy={(({ datum }) => datum.sugar)}
                 text= ' '
                 verticalAnchor={({ text }) => text.length > 1 ? "start" : "middle"}

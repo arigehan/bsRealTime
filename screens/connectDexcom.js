@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import axios from 'axios';
@@ -18,25 +18,13 @@ export default function ConnectDexcom({ navigation }) {
 
   //NEW
 
-  useEffect(() => {
-    async function getValues() {
-      try {
-        const sessionID = await AsyncStorage.getItem('sessionID');
-        if (sessionID !== null) {
-          // We have data!!
-          setLowNotify(JSON.parse(sessionID));
-        }
-      } catch (error) {
-        // Error retrieving data
-      }
-    }
-    
-    getValues();
-
-  }, [])
-
   function saveValues() {
-    AsyncStorage.setItem('sessionID', JSON.stringify(sessionID))
+    AsyncStorage.setItem('dexcomUserName', JSON.stringify(dexcomUserName))
+    .catch((e) => {
+      console.log('Error: ' + JSON.stringify(e));
+    })
+
+    AsyncStorage.setItem('dexcomPassword', JSON.stringify(dexcomPassword))
     .catch((e) => {
       console.log('Error: ' + JSON.stringify(e));
     })
