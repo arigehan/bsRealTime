@@ -88,10 +88,6 @@ export default function Settings({ navigation }) {
       timeToggle : timeToggle,
       highNotify : highNotify,
       lowNotify : lowNotify,
-      dexcomUserName: route.params.dexcomUserName,
-      dexcomPassword: route.params.dexcomPassword,
-      sessionID: route.params.sessionID,
-      accessToken: route.params.accessToken
     });
   }
 

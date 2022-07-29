@@ -5,7 +5,6 @@ import * as React from 'react';
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { VictoryScatter, VictoryChart, VictoryLabel, VictoryAxis } from "victory-native";
-import { useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 //NOTIFICATION 
@@ -26,7 +25,7 @@ export default function SugarGraph({ navigation }) {
   const [accessToken, setAccessToken] = useState();
   const [sessionID, setSessionID] = useState(0);
 
-  useEffect(() => {
+  useEffect(() => { //this isn't automatically updated!!! fix
     async function getValues() {
       try {
         const highNotify = await AsyncStorage.getItem('highNotify');
@@ -97,8 +96,44 @@ export default function SugarGraph({ navigation }) {
     const [sleepEight, setSleepEight] = useState(' ');
     const [sleepNine, setSleepNine] = useState(' ');
 
+    var rawDay = new Date().getDate(); 
+    if (rawDay < 10) {
+      var day = '0' + rawDay.toString();
+    } else {
+      var day = rawDay.toString();
+    }
+    var rawMonth = new Date().getMonth() + 1; 
+    if (rawMonth < 10) {
+      var month = '0' + rawMonth.toString();
+    } else {
+      var month = rawMonth.toString();
+    }
+    var rawYear = new Date().getFullYear(); 
+    var year = rawYear.toString();
+
+    var rawHours = new Date().getHours();
+    if (rawHours < 10) {
+      var hours = '0' + rawHours.toString();
+    } else {
+      var hours = rawHours.toString();
+    } 
+    var rawMin = new Date().getMinutes();
+    if (rawMin < 10) {
+      var min = '0' + rawMin.toString();
+    } else {
+      var min = rawMin.toString();
+    } 
+    var rawSec = new Date().getSeconds();
+    if (rawSec < 10) {
+      var sec = '0' + rawSec.toString();
+    } else {
+      var sec = rawSec.toString();
+    } 
+
+    var fullDate = year + '-' + month + '-' + day;
+console.log(accessToken)
     const updateSleep = () => {
-      axios.get('https://api.fitbit.com/1.2/user/-/sleep/date/2022-07-19/2022-07-20.json', {
+      axios.get(`https://api.fitbit.com/1.2/user/-/sleep/date/2022-07-19/${fullDate}.json`, {
         headers: {'Authorization': `Bearer ${accessToken}`} 
       })
         .then(response =>  {
@@ -233,7 +268,7 @@ export default function SugarGraph({ navigation }) {
       } else if (bloodGlucose <= lowNotify && bloodGlucose !== 0) {
         sendLowNotification(expoPushToken);
       }
-    }
+    };
 
     var numberPattern = /\d+/g;
     var ntimeO = `${timeO}`.match( numberPattern );
@@ -276,9 +311,7 @@ export default function SugarGraph({ navigation }) {
     useEffect(() => { //triggers notification when you get new bs value or the push token
       sendNotification();
     }, [bloodGlucose, expoPushToken]);
-        
-    const route = useRoute(); // allows you to get import the Dexcom username and password from connectDexcom.js 
-  
+          
     function navToSettings() {
       navigation.navigate('Settings')
     }
@@ -342,11 +375,14 @@ export default function SugarGraph({ navigation }) {
       }
     }
 
-    return (
+  return (
       <View style={styles.container}>
-            <Text>{sessionID}</Text>
             <Text>{highNotify}</Text>
-            <Text>{accessToken}</Text>
+            <Text>{fullDate}</Text>
+            <Text>{hours}</Text>
+            <Text>{min}</Text>
+            <Text>{sec}</Text>
+
         {/* 
         <View style={styles.rowContainer}>
           <View style={styles.sleepBox} backgroundColor={sleepColor(currentSleepStage)} >
@@ -455,7 +491,7 @@ async function sendHighNotification(expoPushToken) {
     body: 'Your sugar is elevated',
   };
 
-  let res = await fetch('https://exp.host/--/api/v2/push/send', {
+  await fetch('https://exp.host/--/api/v2/push/send', {
     method: 'POST',
     headers: {
       Accept: 'application/json',

@@ -2,14 +2,12 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import axios from 'axios';
-import { useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default function ConnectDexcom({ navigation }) {
 
-  const route = useRoute();
   const [dexcomUserName, setDexcomUserName] = useState('');
   const [dexcomPassword, setDexcomPassword] = useState('');
   const [sessionID, setSessionID] = useState(0);
@@ -29,7 +27,7 @@ export default function ConnectDexcom({ navigation }) {
       console.log('Error: ' + JSON.stringify(e));
     })
 
-    navToSettings();
+    navToSugarGraph();
   }
 
   //END OF NEW
@@ -62,13 +60,8 @@ export default function ConnectDexcom({ navigation }) {
     });
     }
 
-    function navToSettings() {
-      navigation.navigate('Settings', {
-          dexcomUserName: dexcomUserName,
-          dexcomPassword: dexcomPassword,
-          sessionID: sessionID,
-          accessToken: route.params.accessToken
-      });
+    function navToSugarGraph() {
+      navigation.navigate('SugarGraph');
   }
 
   if (sessionID && sessionID !== '00000000-0000-0000-0000-000000000000') {
