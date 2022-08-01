@@ -55,7 +55,7 @@ export default function SugarGraph({ navigation }) {
     
     getValues();
 
-  }, [])
+  }, []);
 
   //NOTIFICATION 
   const [expoPushToken, setExpoPushToken] = useState('');
@@ -131,7 +131,7 @@ export default function SugarGraph({ navigation }) {
     } 
 
     var fullDate = year + '-' + month + '-' + day;
-console.log(accessToken)
+
     const updateSleep = () => {
       axios.get(`https://api.fitbit.com/1.2/user/-/sleep/date/2022-07-19/${fullDate}.json`, {
         headers: {'Authorization': `Bearer ${accessToken}`} 
@@ -140,7 +140,7 @@ console.log(accessToken)
           console.log(JSON.stringify(response.data));
           let datas = response.data;
   
-          setCurrentSleepStage(datas.sleep[0].levels.data[0].level);
+          setCurrentSleepStage(datas.sleep[0].levels.data[0].level); //displayed furthest right on the graph, even though it is the first sleep stage in the session
           setSleepOne(datas.sleep[0].levels.data[1].level); 
           setSleepTwo(datas.sleep[0].levels.data[2].level); 
           setSleepThree(datas.sleep[0].levels.data[3].level); 
