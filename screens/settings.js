@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Switch } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRoute } from '@react-navigation/native';
-import { Audio } from 'expo-av';
 
 export default function Settings({ navigation }) {
 
@@ -83,34 +82,6 @@ export default function Settings({ navigation }) {
 
     navToSugar();
   }
-
-  //getting test sound button
-  const [sound, setSound] = React.useState();
-
-  async function playSound() {
-    console.log('Loading Sound');
-    const { sound } = await Audio.Sound.createAsync(
-       require('../assets/pianoNotification.mp3')
-    );
-    setSound(sound);
-
-    console.log('Playing Sound');
-    await sound.playAsync();
-    await Audio.setAudioModeAsync({ playsInSilentModeIOS: true }); //plays even in silent mode
-  }
-
-
-  React.useEffect(() => {
-    return sound
-      ? () => {
-          console.log('Unloading Sound');
-          sound.unloadAsync(); }
-      : undefined;
-  }, [sound]);
-
-
-
-  
 
   function navToSugar() {
     navigation.navigate('SugarGraph', {
@@ -206,11 +177,7 @@ export default function Settings({ navigation }) {
           <TouchableOpacity style={styles.button} onPress={saveValues}>
             <Text style={styles.buttonText}>Save</Text>
           </TouchableOpacity>
-          <Text/>          
-          <TouchableOpacity style={styles.button} onPress={playSound}>
-            <Text style={styles.buttonText}>alarm b</Text>
-          </TouchableOpacity>
-
+          
           <Text/> 
           <Text/> 
           <Text/> 

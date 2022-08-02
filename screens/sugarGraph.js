@@ -6,12 +6,13 @@ import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { VictoryScatter, VictoryChart, VictoryLabel, VictoryAxis } from "victory-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Audio } from 'expo-av';
 
 //NOTIFICATION 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
-    shouldPlaySound: false,
+    shouldPlaySound: true,
     shouldSetBadge: false,
   }),
 });
@@ -20,7 +21,9 @@ export default function SugarGraph({ navigation }) {
 
   //Pulling data from settings
   const [lowNotify, setLowNotify] = useState('80');
+  const [lowAlarm, setLowAlarm] = useState('65');
   const [highNotify, setHighNotify] = useState('200');
+  const [highAlarm, setHighAlarm] = useState('250');
   const [timeToggle, setTimeToggle] = useState(false);
   const [accessToken, setAccessToken] = useState();
   const [sessionID, setSessionID] = useState(0);
@@ -31,11 +34,19 @@ export default function SugarGraph({ navigation }) {
         const highNotify = await AsyncStorage.getItem('highNotify');
         if (highNotify !== null) {
           setHighNotify(JSON.parse(highNotify));
-        }            
+        }   
+        const highAlarm = await AsyncStorage.getItem('highAlarm');
+        if (highAlarm !== null) {
+          setHighAlarm(JSON.parse(highAlarm));
+        }          
         const lowNotify = await AsyncStorage.getItem('lowNotify');
         if (lowNotify !== null) {
           setLowNotify(JSON.parse(lowNotify));
         }
+        const lowAlarm = await AsyncStorage.getItem('lowAlarm');
+        if (lowAlarm !== null) {
+          setLowAlarm(JSON.parse(lowAlarm));
+        } 
         const timeToggle = await AsyncStorage.getItem('timeToggle');
         if (timeToggle !== null) {
           setTimeToggle(JSON.parse(timeToggle));
@@ -262,10 +273,10 @@ export default function SugarGraph({ navigation }) {
     };
 
     const sendNotification = () => {
-      if (bloodGlucose >= highNotify) { 
+      if (bloodGlucose >= parseInt(highNotify)) { 
         console.log('sending high notify');
         sendHighNotification(expoPushToken);
-      } else if (bloodGlucose <= lowNotify && bloodGlucose !== 0) {
+      } else if (bloodGlucose <= parseInt(lowNotify) && bloodGlucose !== 0) {
         sendLowNotification(expoPushToken);
       }
     };
@@ -310,6 +321,10 @@ export default function SugarGraph({ navigation }) {
     
     useEffect(() => { //triggers notification when you get new bs value or the push token
       sendNotification();
+    }, [bloodGlucose, expoPushToken]); 
+
+    useEffect(() => { //triggers alarm when you get new bs value or the push token
+      alarmLogic();
     }, [bloodGlucose, expoPushToken]);
           
     function navToSettings() {
@@ -375,10 +390,48 @@ export default function SugarGraph({ navigation }) {
       }
     }
 
+    //ALARM TONE 
+    const [sound, setSound] = React.useState();
+
+    async function playSound() {
+      console.log('Loading Sound');
+      const { sound } = await Audio.Sound.createAsync(
+        require('../assets/pianoNotification.mp3')
+      );
+      setSound(sound);
+
+      console.log('Playing Sound');
+      await sound.playAsync();
+      await Audio.setAudioModeAsync({ 
+        playsInSilentModeIOS: true,
+        interruptionModeAndroid: 1,
+        InterruptionModeIOS: 1,
+        playThroughEarpieceAndroid: true,
+        staysActiveInBackground: true
+      }); 
+    }
+
+    React.useEffect(() => {
+      return sound
+        ? () => {
+            console.log('Unloading Sound');
+            sound.unloadAsync();
+          }
+        : undefined;
+    }, [sound]);  
+
+    async function alarmLogic() {
+      if (bloodGlucose >= parseInt(highAlarm)) {
+        playSound();
+      } else if (bloodGlucose <= parseInt(lowAlarm) && bloodGlucose !== 0) {
+        playSound();
+      }
+    }
+
   return (
       <View style={styles.container}>
-            <Text>{highNotify}</Text>
-            <Text>{fullDate}</Text>
+            <Text>{lowAlarm}</Text>
+            <Text>{parseInt(highAlarm)}</Text>
             <Text>{hours}</Text>
             <Text>{min}</Text>
             <Text>{sec}</Text>
@@ -486,7 +539,7 @@ export default function SugarGraph({ navigation }) {
 async function sendHighNotification(expoPushToken) {
   const message = {
     to: expoPushToken,
-    sound: 'default',
+    sound: '../assets/pianoNotificaion.mp3',
     title: 'High Blood Sugar Notification',
     body: 'Your sugar is elevated',
   };
