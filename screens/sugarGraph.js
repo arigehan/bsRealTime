@@ -393,10 +393,28 @@ export default function SugarGraph({ navigation }) {
     //ALARM TONE 
     const [sound, setSound] = React.useState();
 
-    async function playSound() {
+    async function playHighSound() {
       console.log('Loading Sound');
       const { sound } = await Audio.Sound.createAsync(
         require('../assets/pianoNotification.mp3')
+      );
+      setSound(sound);
+
+      console.log('Playing Sound');
+      await sound.playAsync();
+      await Audio.setAudioModeAsync({ 
+        playsInSilentModeIOS: true,
+        interruptionModeAndroid: 1,
+        InterruptionModeIOS: 1,
+        playThroughEarpieceAndroid: true,
+        staysActiveInBackground: true
+      }); 
+    }
+
+    async function playLowSound() {
+      console.log('Loading Sound');
+      const { sound } = await Audio.Sound.createAsync(
+        require('../assets/dingNotification.wavs')
       );
       setSound(sound);
 
@@ -422,9 +440,9 @@ export default function SugarGraph({ navigation }) {
 
     async function alarmLogic() {
       if (bloodGlucose >= parseInt(highAlarm)) {
-        playSound();
+        playHighSound();
       } else if (bloodGlucose <= parseInt(lowAlarm) && bloodGlucose !== 0) {
-        playSound();
+        playLowSound();
       }
     }
 
