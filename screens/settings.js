@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Switch } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRoute } from '@react-navigation/native';
 import RNPickerSelect from "react-native-picker-select";
 
 export default function Settings({ navigation }) {
 
-  const route = useRoute();
   const [lowNotify, setLowNotify] = useState('80');
   const [lowAlarm, setLowAlarm] = useState('65');
   const [lowAlarmTone, setLowAlarmTone] = useState('../assets/pianoNotification.mp3');
