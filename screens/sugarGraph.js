@@ -22,8 +22,10 @@ export default function SugarGraph({ navigation }) {
   //Pulling data from settings
   const [lowNotify, setLowNotify] = useState('80');
   const [lowAlarm, setLowAlarm] = useState('65');
+  const [lowAlarmTone, setLowAlarmTone] = useState('../assets/pianoNotification.mp3');
   const [highNotify, setHighNotify] = useState('200');
   const [highAlarm, setHighAlarm] = useState('250');
+  const [highAlarmTone, setHighAlarmTone] = useState('../assets/dingNotification.wav');
   const [timeToggle, setTimeToggle] = useState(false);
   const [accessToken, setAccessToken] = useState();
   const [sessionID, setSessionID] = useState(0);
@@ -38,6 +40,10 @@ export default function SugarGraph({ navigation }) {
         const highAlarm = await AsyncStorage.getItem('highAlarm');
         if (highAlarm !== null) {
           setHighAlarm(JSON.parse(highAlarm));
+        }                  
+        const highAlarmTone = await AsyncStorage.getItem('highAlarmTone');
+        if (highAlarmTone !== null) {
+          setHighAlarmTone(JSON.parse(highAlarmTone));
         }          
         const lowNotify = await AsyncStorage.getItem('lowNotify');
         if (lowNotify !== null) {
@@ -46,6 +52,10 @@ export default function SugarGraph({ navigation }) {
         const lowAlarm = await AsyncStorage.getItem('lowAlarm');
         if (lowAlarm !== null) {
           setLowAlarm(JSON.parse(lowAlarm));
+        }         
+        const lowAlarmTone = await AsyncStorage.getItem('lowAlarmTone');
+        if (lowAlarmTone !== null) {
+          setLowAlarmTone(JSON.parse(lowAlarmTone));
         } 
         const timeToggle = await AsyncStorage.getItem('timeToggle');
         if (timeToggle !== null) {
@@ -65,6 +75,13 @@ export default function SugarGraph({ navigation }) {
     }
     
     getValues();
+
+    const unsubscribe = navigation.addListener('focus', () => {
+      getValues();
+    });
+    return () => {
+      unsubscribe;
+    };
 
   }, []);
 
@@ -322,10 +339,6 @@ export default function SugarGraph({ navigation }) {
     useEffect(() => { //triggers notification when you get new bs value or the push token
       sendNotification();
     }, [bloodGlucose, expoPushToken]); 
-
-    useEffect(() => { //triggers alarm when you get new bs value or the push token
-      alarmLogic();
-    }, [bloodGlucose, expoPushToken]);
           
     function navToSettings() {
       navigation.navigate('Settings')
@@ -395,38 +408,74 @@ export default function SugarGraph({ navigation }) {
 
     async function playHighSound() {
       console.log('Loading Sound');
-      const { sound } = await Audio.Sound.createAsync(
-        require('../assets/pianoNotification.mp3')
-      );
-      setSound(sound);
+      //need to add else if statements for each alarm tone option you add
+      if (highAlarmTone === '../assets/pianoNotificaion.mp3') {
+        const { sound } = await Audio.Sound.createAsync(
+          require('../assets/pianoNotification.mp3')
+        );
+        setSound(sound);
 
-      console.log('Playing Sound');
-      await sound.playAsync();
-      await Audio.setAudioModeAsync({ 
-        playsInSilentModeIOS: true,
-        interruptionModeAndroid: 1,
-        InterruptionModeIOS: 1,
-        playThroughEarpieceAndroid: true,
-        staysActiveInBackground: true
-      }); 
+        console.log('Playing Sound');
+        await sound.playAsync();
+        await Audio.setAudioModeAsync({ 
+          playsInSilentModeIOS: true,
+          interruptionModeAndroid: 1,
+          InterruptionModeIOS: 1,
+          playThroughEarpieceAndroid: true,
+          staysActiveInBackground: true
+        }); 
+      } else {
+        const { sound } = await Audio.Sound.createAsync(
+          require('../assets/dingNotification.wav') //ding is high default, thus else statment 
+        );
+        setSound(sound);
+
+        console.log('Playing Sound');
+        await sound.playAsync();
+        await Audio.setAudioModeAsync({ 
+          playsInSilentModeIOS: true,
+          interruptionModeAndroid: 1,
+          InterruptionModeIOS: 1,
+          playThroughEarpieceAndroid: true,
+          staysActiveInBackground: true
+        }); 
+      }
     }
 
     async function playLowSound() {
       console.log('Loading Sound');
-      const { sound } = await Audio.Sound.createAsync(
-        require('../assets/dingNotification.wavs')
-      );
-      setSound(sound);
+      //need to add else if statements for each alarm tone option you add
+      if (lowAlarmTone === '../assets/dingNotification.wav') {
+        const { sound } = await Audio.Sound.createAsync(
+          require('../assets/dingNotification.wav')
+        );
+        setSound(sound);
 
-      console.log('Playing Sound');
-      await sound.playAsync();
-      await Audio.setAudioModeAsync({ 
-        playsInSilentModeIOS: true,
-        interruptionModeAndroid: 1,
-        InterruptionModeIOS: 1,
-        playThroughEarpieceAndroid: true,
-        staysActiveInBackground: true
-      }); 
+        console.log('Playing Sound');
+        await sound.playAsync();
+        await Audio.setAudioModeAsync({ 
+          playsInSilentModeIOS: true,
+          interruptionModeAndroid: 1,
+          InterruptionModeIOS: 1,
+          playThroughEarpieceAndroid: true,
+          staysActiveInBackground: true
+        }); 
+      } else {
+        const { sound } = await Audio.Sound.createAsync(
+          require('../assets/pianoNotification.mp3') //piano is low default, thus else statment 
+        );
+        setSound(sound);
+
+        console.log('Playing Sound');
+        await sound.playAsync();
+        await Audio.setAudioModeAsync({ 
+          playsInSilentModeIOS: true,
+          interruptionModeAndroid: 1,
+          InterruptionModeIOS: 1,
+          playThroughEarpieceAndroid: true,
+          staysActiveInBackground: true
+        }); 
+      }
     }
 
     React.useEffect(() => {
@@ -438,55 +487,21 @@ export default function SugarGraph({ navigation }) {
         : undefined;
     }, [sound]);  
 
-    async function alarmLogic() {
+      
+    useEffect(() => { //triggers alarm when you get new bs value or alarm value (this is why it kinda plays the wrong one first...)
       if (bloodGlucose >= parseInt(highAlarm)) {
         playHighSound();
       } else if (bloodGlucose <= parseInt(lowAlarm) && bloodGlucose !== 0) {
         playLowSound();
       }
-    }
+    }, [lowAlarm, highAlarm, bloodGlucose]);  
 
   return (
       <View style={styles.container}>
-            <Text>{lowAlarm}</Text>
-            <Text>{parseInt(highAlarm)}</Text>
-            <Text>{hours}</Text>
-            <Text>{min}</Text>
-            <Text>{sec}</Text>
-
-        {/* 
-        <View style={styles.rowContainer}>
-          <View style={styles.sleepBox} backgroundColor={sleepColor(currentSleepStage)} >
-            <Text>{currentSleepStage}</Text>
-          </View>
-          <View style={styles.sleepBox} backgroundColor={sleepColor(sleepOne)} >
-            <Text>{sleepOne}</Text>
-          </View>        
-          <View style={styles.sleepBox} backgroundColor={sleepColor(sleepTwo)} >
-            <Text>{sleepTwo}</Text>
-          </View>
-          <View style={styles.sleepBox} backgroundColor={sleepColor(sleepThree)} >
-            <Text>{sleepThree}</Text>
-          </View>
-          <View style={styles.sleepBox} backgroundColor={sleepColor(sleepFour)} >
-            <Text>{sleepFour}</Text>
-          </View>
-          <View style={styles.sleepBox} backgroundColor={sleepColor(sleepFive)} >
-            <Text>{sleepFive}</Text>
-          </View>
-          <View style={styles.sleepBox} backgroundColor={sleepColor(sleepSix)} >
-            <Text>{sleepSix}</Text>
-          </View>
-          <View style={styles.sleepBox} backgroundColor={sleepColor(sleepSeven)} >
-            <Text>{sleepSeven}</Text>
-          </View>
-          <View style={styles.sleepBox} backgroundColor={sleepColor(sleepEight)} >
-            <Text>{sleepEight}</Text>
-          </View>
-          <View style={styles.sleepBox} backgroundColor={sleepColor(sleepNine)} >
-            <Text>{sleepNine}</Text>
-          </View>
-        </View>   */}
+            <Text>low alarm: {lowAlarm}</Text>
+            <Text>low tone: {lowAlarmTone}</Text>
+            <Text>high alarm: {highAlarm}</Text>
+            <Text>high tone: {highAlarmTone}</Text>
         <Text style={{ fontSize: 30, color: '#1f95bd' }}>Current Blood Glucose:</Text>
         <Text style={{ fontSize: 50, color:'#08518e' }}>{ bloodGlucose }</Text>
         <Text style={{ fontSize: 30, color: '#1f95bd' }}>{ sugarTrendDisplay }</Text>
@@ -557,7 +572,7 @@ export default function SugarGraph({ navigation }) {
 async function sendHighNotification(expoPushToken) {
   const message = {
     to: expoPushToken,
-    sound: '../assets/pianoNotificaion.mp3',
+    sound: '../assets/pianoNotification.mp3',
     title: 'High Blood Sugar Notification',
     body: 'Your sugar is elevated',
   };
@@ -634,16 +649,6 @@ async function registerForPushNotificationsAsync() {
     image: {
       height: 40,
       width: 40,
-    },
-    overlayView: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    sleepBox: {
-      width: 32, //32 or 29
-      height: 216,
-      borderRadius: 7
     },
     rowContainer: {
       flexDirection: 'row',
